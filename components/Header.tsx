@@ -12,43 +12,8 @@ import {
   BookOpenIcon,
   HeartPulseIcon
 } from "lucide-react";
-import { useMixpanelDeviceId } from "@/lib/useMixpanelDeviceId";
-
 export function Header() {
   const pathname = usePathname();
-  const { deviceId, isPolling } = useMixpanelDeviceId();
-
-  // Get vertical-specific Mixpanel data view ID
-  const getViewId = () => {
-    if (pathname.startsWith('/checkout')) return '4354009';   // weBuy
-    if (pathname.startsWith('/financial')) return '4354010';  // iBank
-    if (pathname.startsWith('/streaming')) return '4354011';  // meTube
-    if (pathname.startsWith('/admin')) return '4354012';      // youAdmin
-    if (pathname.startsWith('/wellness')) return '4354013';   // ourHeart
-    if (pathname.startsWith('/lifestyle')) return '4354015';  // theyRead
-    return '3782804'; // Default to global view for root/other pages
-  };
-
-  // Determine Mixpanel URL based on device ID availability
-  const getMixpanelUrl = () => {
-    const viewId = getViewId();
-
-    // On root page, always link to generic events page
-    if (pathname === '/') {
-      return "https://mixpanel.com/project/3276012/view/3782804/app/events";
-    }
-
-    // If we have a device ID, link to the profile in the vertical-specific view
-    if (deviceId) {
-      return `https://mixpanel.com/project/3276012/view/${viewId}/app/profile#distinct_id=%24device%3A${deviceId}`;
-    }
-
-    // No device ID yet - return null to disable link
-    return null;
-  };
-
-  const mixpanelUrl = getMixpanelUrl();
-  const isLinkDisabled = !mixpanelUrl;
 
   // Determine which microsite we're in
   const isFinancial = pathname.startsWith('/financial');
@@ -205,7 +170,7 @@ export function Header() {
           </>
         )}
 
-        {/* Always show Reset and Mixpanel links */}
+        {/* Reset link */}
         <Link
           className="text-sm font-medium hover:underline underline-offset-4 text-red-500"
           href="#"
@@ -217,23 +182,6 @@ export function Header() {
         >
           Reset
         </Link>
-
-        {isLinkDisabled ? (
-          <span
-            className="text-sm font-medium text-gray-400 cursor-not-allowed"
-            title={isPolling ? "Loading device ID..." : "Device ID not available"}
-          >
-            MIXPANEL
-          </span>
-        ) : (
-          <Link
-            className="text-sm font-medium hover:underline underline-offset-4 text-purple-500"
-            href={mixpanelUrl!}
-            target="_blank"
-          >
-            MIXPANEL
-          </Link>
-        )}
       </nav>
     </header>
   );

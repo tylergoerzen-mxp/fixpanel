@@ -37,7 +37,6 @@
 		"clsx": "^2.1.1",
 		"framer-motion": "^11.3.30",
 		"lucide-react": "^0.436.0",
-		"mixpanel-browser": "^2.71.0",
 		"next": "^14.2.35",
 		"p-limit": "^6.1.0",
 		"react": "^18",
@@ -47,7 +46,6 @@
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.40.0",
-		"@types/mixpanel-browser": "^2.60.0",
 		"@types/node": "^20",
 		"@types/react": "^18",
 		"@types/react-dom": "^18",
