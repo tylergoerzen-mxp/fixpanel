@@ -33,8 +33,8 @@ const mixpanelStub = {
     delete_user: noOp,
   },
   flags: {
-    get_variant_value: (_flag: string) => undefined,
-    get_feature_data: async (_flag: string) => ({}),
+    get_variant_value: (_flag: string, _fallback?: any): Promise<any> => Promise.resolve(undefined),
+    get_feature_data: (_flag: string): Promise<any> => Promise.resolve({}),
   },
   start_session_recording: noOp,
   stop_session_recording: noOp,
