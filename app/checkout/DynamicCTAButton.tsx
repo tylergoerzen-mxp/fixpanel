@@ -3,22 +3,13 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, X, Gift, Zap, Rocket, AlertCircle } from "lucide-react";
-import { initMixpanelOnce } from "@/lib/analytics";
-
-// @ts-ignore
-declare global {
-  interface Window {
-    mixpanel: any;
-  }
-}
 
 interface CTAConfig {
-  cta: string;         // Button text
-  description: string; // Tooltip text
-  color: string;       // Button background color
+  cta: string;
+  description: string;
+  color: string;
 }
 
-// Default configs for testing (these should come from Mixpanel in production)
 const defaultConfigs: { [key: string]: CTAConfig } = {
   snag: {
     cta: "Snag It! ⚡️",
@@ -46,86 +37,21 @@ export function DynamicCTAButton() {
   const [config, setConfig] = useState<CTAConfig | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [variantKey, setVariantKey] = useState<string>("");
 
   useEffect(() => {
-    initMixpanelOnce();
-
-    // Fetch feature flag configuration
-    if (window.mixpanel?.flags) {
-      window.mixpanel.flags
-        .get_variant_value('we_buy_custom_cta', null)
-        .then((value: any) => {
-          console.log('[MIXPANEL]: Got CTA config:', value);
-
-          if (value && typeof value === 'object' && 'cta' in value) {
-            setConfig(value as CTAConfig);
-            // Try to determine variant key for tracking
-            Object.entries(defaultConfigs).forEach(([key, cfg]) => {
-              if (cfg.cta === value.cta) {
-                setVariantKey(key);
-              }
-            });
-
-            window.mixpanel.track('Dynamic CTA Loaded', {
-              variant: variantKey || 'custom',
-              cta_text: value.cta,
-              color: value.color
-            });
-          } else {
-            // Fallback to a random default for demo purposes
-            const keys = Object.keys(defaultConfigs);
-            const randomKey = keys[Math.floor(Math.random() * keys.length)];
-            setConfig(defaultConfigs[randomKey]);
-            setVariantKey(randomKey);
-
-            console.log('[MIXPANEL]: Using fallback CTA config:', randomKey);
-            window.mixpanel.track('Dynamic CTA Loaded', {
-              variant: randomKey,
-              cta_text: defaultConfigs[randomKey].cta,
-              color: defaultConfigs[randomKey].color,
-              is_fallback: true
-            });
-          }
-          setIsLoading(false);
-        })
-        .catch((error: any) => {
-          console.error('[MIXPANEL]: Error fetching CTA config:', error);
-          // Use fallback on error
-          const fallbackKey = 'snag';
-          setConfig(defaultConfigs[fallbackKey]);
-          setVariantKey(fallbackKey);
-          setIsLoading(false);
-        });
-    } else {
-      // No Mixpanel, use fallback
-      const fallbackKey = 'snag';
-      setConfig(defaultConfigs[fallbackKey]);
-      setVariantKey(fallbackKey);
-      setIsLoading(false);
-    }
+    const keys = Object.keys(defaultConfigs);
+    const randomKey = keys[Math.floor(Math.random() * keys.length)];
+    setConfig(defaultConfigs[randomKey]);
+    setVariantKey(randomKey);
   }, []);
 
   const handleClick = () => {
-    if (window.mixpanel) {
-      window.mixpanel.track('Dynamic CTA Clicked', {
-        variant: variantKey,
-        cta_text: config?.cta,
-        color: config?.color
-      });
-    }
-
     setShowModal(true);
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
-    if (window.mixpanel) {
-      window.mixpanel.track('Dynamic CTA Modal Closed', {
-        variant: variantKey
-      });
-    }
   };
 
   const getModalContent = () => {
@@ -177,16 +103,12 @@ export function DynamicCTAButton() {
     }
   };
 
-  // Don't render anything while loading or if no config
-  if (isLoading || !config) {
+  if (!config) {
     return null;
   }
 
-  // Determine text color based on background brightness
   const getTextColor = (bgColor: string) => {
-    // Simple check: dark backgrounds get white text
-    const isDark = bgColor === '#111111' || bgColor.toLowerCase().includes('000');
-    return isDark ? '#ffffff' : '#ffffff'; // Keep white for all our variants
+    return '#ffffff';
   };
 
   const modalContent = getModalContent();
@@ -365,13 +287,7 @@ export function DynamicCTAButton() {
                     <div className="text-2xl font-mono font-bold text-gray-900">{modalContent.code}</div>
                     <button
                       onClick={() => {
-                        navigator.clipboard.writeText(modalContent.code);
-                        if (window.mixpanel) {
-                          window.mixpanel.track('Dynamic CTA Code Copied', {
-                            variant: variantKey,
-                            code: modalContent.code
-                          });
-                        }
+                        navigator.clipboard.writeText(modalContent.code!);
                       }}
                       className="mt-2 text-sm text-purple-600 hover:text-purple-800 transition-colors"
                     >

@@ -28,7 +28,6 @@ import {
   FlagIcon,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { trackMicrositeSession } from "@/lib/analytics";
 
 // Mock video data - Expanded catalog for better demo
 const featuredVideos = [
@@ -506,7 +505,6 @@ export default function MeTubeHomePage() {
     document.title = "meTube";
 
     // Track session start
-    trackMicrositeSession('meTube');
   }, []);
 
   const filteredVideos = featuredVideos.filter(video => {
@@ -519,15 +517,6 @@ export default function MeTubeHomePage() {
     const video = featuredVideos.find(v => v.id === videoId);
 
     // Track video view
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Video Clicked', {
-        video_id: videoId,
-        video_title: video?.title,
-        channel: video?.channel,
-        duration: video?.duration
-      });
-    }
-
     // Navigate to video player (all videos play the same Rick Roll!)
     router.push('/streaming/watch');
   };
@@ -550,15 +539,7 @@ export default function MeTubeHomePage() {
       });
     }
 
-    // Track like action
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track(isLiked ? 'Video Unliked' : 'Video Liked', {
-        video_id: videoId,
-        video_title: video?.title,
-        channel: video?.channel
-      });
-    }
-  };
+    // Track like action  };
 
   const handleSubscribe = (channel: string) => {
     const isSubscribed = subscribedChannels.has(channel);
@@ -568,22 +549,8 @@ export default function MeTubeHomePage() {
     const shouldWork = Math.random() < 0.1;
 
     // Track subscription attempt
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Subscribe Attempted', {
-        channel: channel,
-        was_subscribed: isSubscribed
-      });
-    }
-
     if (!shouldWork) {
-      // Track failed subscription
-      if (typeof window !== 'undefined' && window.mixpanel) {
-        window.mixpanel.track('Subscribe Failed', {
-          channel: channel,
-          failure_reason: 'button_malfunction'
-        });
-      }
-      return; // Button doesn't work!
+      // Track failed subscription      return; // Button doesn't work!
     }
 
     // If it works, proceed with subscription
@@ -601,22 +568,10 @@ export default function MeTubeHomePage() {
       });
     }
 
-    // Track successful subscription
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track(isSubscribed ? 'Unsubscribed' : 'Subscribed', {
-        channel: channel
-      });
-    }
-  };
+    // Track successful subscription  };
 
   // Track page view
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Browse Videos', {
-        category: selectedCategory
-      });
-    }
-  }, [selectedCategory]);
+  useEffect(() => {  }, [selectedCategory]);
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -652,14 +607,7 @@ export default function MeTubeHomePage() {
                 size="sm"
                 className="absolute right-0 top-0 h-full px-4 bg-gray-100 hover:bg-gray-200 active:scale-95 text-gray-600 rounded-r-full border-l transition-all"
                 onClick={(e) => {
-                  e.stopPropagation();
-                  if (typeof window !== 'undefined' && window.mixpanel) {
-                    window.mixpanel.track('Button Clicked', {
-                      button_name: 'Search',
-                      page: 'meTube Home'
-                    });
-                  }
-                }}
+                  e.stopPropagation();                }}
               >
                 <SearchIcon className="h-4 w-4" />
               </Button>
@@ -686,14 +634,7 @@ export default function MeTubeHomePage() {
               <motion.div
                 className="flex items-center gap-6 px-3 py-2 hover:bg-gray-100 rounded-lg cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all"
                 whileHover={{ backgroundColor: "#f3f4f6" }}
-                onClick={() => {
-                  if (typeof window !== 'undefined' && window.mixpanel) {
-                    window.mixpanel.track('Navigation Clicked', {
-                      nav_item: 'Home',
-                      page: 'meTube Home'
-                    });
-                  }
-                }}
+                onClick={() => {                }}
               >
                 <HomeIcon className="h-5 w-5" />
                 {!sidebarCollapsed && <span className="text-sm font-medium">Home</span>}
@@ -701,14 +642,7 @@ export default function MeTubeHomePage() {
               <motion.div
                 className="flex items-center gap-6 px-3 py-2 hover:bg-gray-100 rounded-lg cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all"
                 whileHover={{ backgroundColor: "#f3f4f6" }}
-                onClick={() => {
-                  if (typeof window !== 'undefined' && window.mixpanel) {
-                    window.mixpanel.track('Navigation Clicked', {
-                      nav_item: 'Trending',
-                      page: 'meTube Home'
-                    });
-                  }
-                }}
+                onClick={() => {                }}
               >
                 <TrendingUpIcon className="h-5 w-5" />
                 {!sidebarCollapsed && <span className="text-sm font-medium">Trending</span>}
@@ -716,14 +650,7 @@ export default function MeTubeHomePage() {
               <motion.div
                 className="flex items-center gap-6 px-3 py-2 hover:bg-gray-100 rounded-lg cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all"
                 whileHover={{ backgroundColor: "#f3f4f6" }}
-                onClick={() => {
-                  if (typeof window !== 'undefined' && window.mixpanel) {
-                    window.mixpanel.track('Navigation Clicked', {
-                      nav_item: 'History',
-                      page: 'meTube Home'
-                    });
-                  }
-                }}
+                onClick={() => {                }}
               >
                 <HistoryIcon className="h-5 w-5" />
                 {!sidebarCollapsed && <span className="text-sm font-medium">History</span>}
@@ -805,17 +732,7 @@ export default function MeTubeHomePage() {
               <motion.button
                 className="ml-auto px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all bg-[#CC332B] text-white hover:bg-[#CC332B]/90 relative"
                 onClick={() => {
-                  setShowRecommender(true);
-                  if (typeof window !== 'undefined' && window.mixpanel) {
-                    window.mixpanel.track('Video Recommender Opened', {
-                      source_page: 'home',
-                      current_category: selectedCategory,
-                      has_search_term: searchTerm.length > 0,
-                      liked_videos_count: likedVideos.size,
-                      subscribed_channels_count: subscribedChannels.size
-                    });
-                  }
-                }}
+                  setShowRecommender(true);                }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >

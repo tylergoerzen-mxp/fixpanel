@@ -298,15 +298,7 @@ export default function EmployeesPage() {
   const [showPermissionError, setShowPermissionError] = useState(false);
   const [showExportError, setShowExportError] = useState(false);
 
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.mixpanel) {
-      window.mixpanel.track("Employees Page Viewed", {
-        total_employees: employees.length,
-        departments_count: Array.from(new Set(employees.map(emp => emp.department))).length,
-        referrer: document.referrer || 'direct'
-      });
-    }
-  }, []);
+  useEffect(() => {  }, []);
 
   const departments = ["all", ...Array.from(new Set(employees.map((emp) => emp.department)))];
 
@@ -323,21 +315,9 @@ export default function EmployeesPage() {
     // 25% chance of permission error (FRICTION!)
     const hasPermissionError = Math.random() < 0.25;
 
-    if (hasPermissionError) {
-      if (typeof window !== "undefined" && window.mixpanel) {
-        window.mixpanel.track("Permission Error", {
-          action: "Add Employee",
-          attempted_name: newEmployee.name,
-          error_type: "insufficient_permissions",
-        });
-      }
-      setShowPermissionError(true);
+    if (hasPermissionError) {      setShowPermissionError(true);
       setTimeout(() => setShowPermissionError(false), 4000);
       return;
-    }
-
-    if (typeof window !== "undefined" && window.mixpanel) {
-      window.mixpanel.track("Employee Added", newEmployee);
     }
     setShowAddModal(false);
     setNewEmployee({ name: "", email: "", department: "Engineering", role: "", location: "" });
@@ -347,25 +327,10 @@ export default function EmployeesPage() {
 
   const handleExportCSV = () => {
     // Track export attempt
-    if (typeof window !== "undefined" && window.mixpanel) {
-      window.mixpanel.track("CSV Export Attempted", {
-        employee_count: filteredEmployees.length,
-        department_filter: selectedDepartment,
-        search_term: searchTerm,
-      });
-    }
-
     // BROKEN CSV EXPORT (FRICTION!)
     // This will always fail with a fake error
     setShowExportError(true);
     setTimeout(() => setShowExportError(false), 5000);
-
-    if (typeof window !== "undefined" && window.mixpanel) {
-      window.mixpanel.track("CSV Export Failed", {
-        employee_count: filteredEmployees.length,
-        error_type: "export_failure",
-      });
-    }
   };
 
   return (
@@ -392,14 +357,7 @@ export default function EmployeesPage() {
                 <Button
                   className="bg-blue-600 text-white hover:bg-blue-700 hover:bg-opacity-90 active:scale-95 transition-all"
                   onClick={() => {
-                    setShowAddModal(true);
-                    if (typeof window !== "undefined" && window.mixpanel) {
-                      window.mixpanel.track("Add Employee Modal Opened", {
-                        current_employee_count: employees.length,
-                        selected_department: selectedDepartment
-                      });
-                    }
-                  }}
+                    setShowAddModal(true);                  }}
                 >
                   <UsersIcon className="h-4 w-4 mr-2" />
                   Add New Employee
@@ -421,11 +379,7 @@ export default function EmployeesPage() {
                     placeholder="Search employees by name, email, or role..."
                     value={searchTerm}
                     onChange={(e) => {
-                      setSearchTerm(e.target.value);
-                      if (typeof window !== "undefined" && window.mixpanel) {
-                        window.mixpanel.track("Employee Search", { search_term: e.target.value });
-                      }
-                    }}
+                      setSearchTerm(e.target.value);                    }}
                     className="pl-10 bg-white"
                   />
                 </div>
@@ -434,11 +388,7 @@ export default function EmployeesPage() {
                 <select
                   value={selectedDepartment}
                   onChange={(e) => {
-                    setSelectedDepartment(e.target.value);
-                    if (typeof window !== "undefined" && window.mixpanel) {
-                      window.mixpanel.track("Employee Filter Changed", { department: e.target.value });
-                    }
-                  }}
+                    setSelectedDepartment(e.target.value);                  }}
                   className="w-full px-4 py-2 bg-white border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   {departments.map((dept) => (
@@ -520,15 +470,7 @@ export default function EmployeesPage() {
                             size="sm"
                             className="hover:bg-opacity-90 active:scale-95 transition-all"
                             onClick={() => {
-                              setSelectedEmployee(employee);
-                              if (typeof window !== "undefined" && window.mixpanel) {
-                                window.mixpanel.track("View Employee Profile", {
-                                  employee_id: employee.id,
-                                  employee_name: employee.name,
-                                  department: employee.department,
-                                });
-                              }
-                            }}
+                              setSelectedEmployee(employee);                            }}
                           >
                             View Details
                           </Button>
@@ -696,15 +638,7 @@ export default function EmployeesPage() {
                     variant="outline"
                     className="hover:bg-opacity-90 active:scale-95 transition-all"
                     onClick={() => {
-                      window.open("https://storage.googleapis.com/mp-customer-upload/RickRoll.mp4", "_blank");
-                      if (typeof window !== "undefined" && window.mixpanel) {
-                        window.mixpanel.track("Employee Edit Rickrolled", {
-                          employee_id: selectedEmployee.id,
-                          employee_name: selectedEmployee.name,
-                          employee_department: selectedEmployee.department
-                        });
-                      }
-                    }}
+                      window.open("https://storage.googleapis.com/mp-customer-upload/RickRoll.mp4", "_blank");                    }}
                   >
                     Edit Profile
                   </Button>

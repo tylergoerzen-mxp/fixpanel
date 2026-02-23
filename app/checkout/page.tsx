@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import Link from "next/link";
-import { trackMicrositeSession } from "@/lib/analytics";
 import {
   ShoppingCartIcon,
   SearchIcon,
@@ -33,7 +32,6 @@ export default function WeBuyHomePage() {
     document.title = "weBuy";
 
     // Track session start
-    trackMicrositeSession('weBuy');
 
     if (typeof window !== 'undefined') {
       const savedCart = sessionStorage.getItem('theybuy_cart');
@@ -64,16 +62,6 @@ export default function WeBuyHomePage() {
 
   const addToCart = (productId: number) => {
     // Track add to cart event
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      const product = products.find(p => p.id === productId);
-      window.mixpanel.track('Add to Cart', {
-        product_id: productId,
-        product_name: product?.name,
-        product_price: product?.price,
-        product_category: product?.category
-      });
-    }
-
     setCart(prev => {
       const existing = prev.find(item => item.id === productId);
       if (existing) {
@@ -94,16 +82,7 @@ export default function WeBuyHomePage() {
   const openProductModal = (product: typeof products[0]) => {
     setSelectedProduct(product);
 
-    // Track product view
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Product Viewed', {
-        product_id: product.id,
-        product_name: product.name,
-        product_price: product.price,
-        product_category: product.category
-      });
-    }
-  };
+    // Track product view  };
 
   const closeProductModal = () => {
     setSelectedProduct(null);
@@ -293,16 +272,7 @@ export default function WeBuyHomePage() {
                           variant="outline"
                           size="icon"
                           onClick={(e) => {
-                            e.stopPropagation();
-                            if (typeof window !== 'undefined' && window.mixpanel) {
-                              window.mixpanel.track('Button Clicked', {
-                                button_name: 'Favorite Product',
-                                product_id: product.id,
-                                product_name: product.name,
-                                page: 'weBuy Home'
-                              });
-                            }
-                          }}
+                            e.stopPropagation();                          }}
                           className="hover:bg-opacity-90 active:scale-95 transition-all"
                           style={{ backgroundColor: "#ffffff", borderColor: "#e5e5e5", color: "#333333" }}
                         >
@@ -484,16 +454,7 @@ export default function WeBuyHomePage() {
                           variant="outline"
                           size="lg"
                           onClick={(e) => {
-                            e.stopPropagation();
-                            if (typeof window !== 'undefined' && window.mixpanel) {
-                              window.mixpanel.track('Button Clicked', {
-                                button_name: 'Favorite Product Modal',
-                                product_id: selectedProduct.id,
-                                product_name: selectedProduct.name,
-                                page: 'weBuy Product Modal'
-                              });
-                            }
-                          }}
+                            e.stopPropagation();                          }}
                           className="hover:bg-opacity-90 active:scale-95 transition-all"
                           style={{ backgroundColor: "#ffffff", borderColor: "#e5e5e5", color: "#333333" }}
                         >

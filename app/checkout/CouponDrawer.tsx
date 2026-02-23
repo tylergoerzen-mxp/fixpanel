@@ -4,9 +4,7 @@ import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Copy, Check, Gift, Sparkles, Tag, Star, Zap, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { initMixpanelOnce, mixpanel } from "@/lib/analytics";
 
-const experimentId = "they-buy-coupon-offer";
 type Variant = "Control (10% off)" | "A (13% odd # letters)" | "B (15% items with q)" | "C (12% off plurals)" | "D (25% off rhymes)";
 const fallbackVariant: Variant = "Control (10% off)";
 
@@ -85,67 +83,17 @@ export function CouponDrawer() {
   const [isDismissed, setIsDismissed] = React.useState(false);
   const [isRevealed, setIsRevealed] = React.useState(false);
   const [isCopied, setIsCopied] = React.useState(false);
-  const [variant, setVariant] = React.useState<Variant | null>(null);
-  const [offer, setOffer] = React.useState<OfferConfig>(offerConfigs.control);
-
-  React.useEffect(() => {
-    initMixpanelOnce();
-
-    // Don't auto-open the drawer, just make it visible
-    // const openTimer = setTimeout(() => setIsOpen(true), 2000);
-
-    mixpanel.flags
-      .get_variant_value(experimentId, fallbackVariant)
-      .then((returnedVariant: unknown) => {
-        let v = returnedVariant as Variant;
-        if (!v || typeof v !== "string") v = fallbackVariant;
-
-        console.log("[MIXPANEL]: GOT FLAG (Coupon Offer)", v);
-        setVariant(v);
-
-        // Map variant to offer config
-        const variantStr = String(v).toLowerCase();
-        if (variantStr.includes("13%") || variantStr.includes("odd")) {
-          setOffer(offerConfigs.a);
-        } else if (variantStr.includes("15%") || variantStr.includes("q")) {
-          setOffer(offerConfigs.b);
-        } else if (variantStr.includes("12%") || variantStr.includes("plural")) {
-          setOffer(offerConfigs.c);
-        } else if (variantStr.includes("25%") || variantStr.includes("rhyme")) {
-          setOffer(offerConfigs.d);
-        } else {
-          setOffer(offerConfigs.control);
-        }
-
-        mixpanel.track("Coupon Offer Loaded", { variant: v });
-      });
-
-    // return () => clearTimeout(openTimer);
-  }, []);
+  const variant: Variant = fallbackVariant;
+  const offer: OfferConfig = offerConfigs.control;
 
   const handleReveal = () => {
     setIsRevealed(true);
-    if (variant && typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Coupon Revealed', {
-        variant,
-        offer_code: offer.code,
-        discount: offer.discount,
-      });
-    }
   };
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(offer.code);
       setIsCopied(true);
-
-      if (variant && typeof window !== 'undefined' && window.mixpanel) {
-        window.mixpanel.track('Coupon Copied', {
-          variant,
-          offer_code: offer.code,
-        });
-      }
-
       setTimeout(() => setIsCopied(false), 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
@@ -155,22 +103,6 @@ export function CouponDrawer() {
   const handleClose = () => {
     setIsOpen(false);
     setIsDismissed(true);
-    if (variant && typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Coupon Drawer Closed', {
-        variant,
-        was_revealed: isRevealed,
-      });
-    }
-  };
-
-  const handleReopen = () => {
-    setIsOpen(true);
-    if (variant && typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Coupon Drawer Reopened', {
-        variant,
-        was_revealed: isRevealed,
-      });
-    }
   };
 
   const Icon = offer.icon;
@@ -326,30 +258,9 @@ export function CouponDrawer() {
 
             {/* Footer */}
             <div className="p-4 border-t border-gray-200">
-              <div className="flex flex-col items-center gap-2">
-                <div className="flex items-center gap-2 text-xs text-gray-500">
-                  <span>Powered by feature flags</span>
-                  <ExternalLink className="h-3 w-3" />
-                </div>
-                <div className="flex justify-center gap-3 text-xs">
-                  <a
-                    href="https://mixpanel.com/project/3276012/view/3782804/app/feature-flags/2318d3c5-497a-43d7-adec-67cc000b7f8d"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-gray-500 hover:text-gray-700 underline transition-colors"
-                  >
-                    View Flag
-                  </a>
-                  <span className="text-gray-300">•</span>
-                  <a
-                    href="https://mixpanel.com/project/3276012/view/3782804/app/experiments/933490cb-7727-48a0-ae1d-ade673507b4c"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-gray-500 hover:text-gray-700 underline transition-colors"
-                  >
-                    View Experiment
-                  </a>
-                </div>
+              <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
+                <span>Powered by feature flags</span>
+                <ExternalLink className="h-3 w-3" />
               </div>
             </div>
           </motion.div>
@@ -359,17 +270,9 @@ export function CouponDrawer() {
 
     {/* Offer Tab - Shows when drawer is closed */}
     <AnimatePresence>
-      {!isOpen && variant && (
+      {!isOpen && (
         <motion.button
-          onClick={() => {
-            setIsOpen(true);
-            if (isDismissed && variant && typeof window !== 'undefined' && window.mixpanel) {
-              window.mixpanel.track('Coupon Drawer Reopened', {
-                variant,
-                was_revealed: isRevealed,
-              });
-            }
-          }}
+          onClick={() => setIsOpen(true)}
           className={`fixed left-0 top-1/2 -translate-y-1/2 bg-gradient-to-r ${offer.bgGradient} text-white px-3 py-6 rounded-r-lg shadow-lg z-40 flex flex-col items-center gap-2 hover:px-4 transition-all`}
           initial={{ x: -100, opacity: 0 }}
           animate={{
@@ -386,7 +289,6 @@ export function CouponDrawer() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          {/* Add attention-grabbing wiggle animation */}
           <motion.div
             animate={{
               rotate: [0, -10, 10, -10, 10, 0],

@@ -25,14 +25,7 @@ const distributionLists = [
 ];
 
 export default function EmailSetupPage() {
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.mixpanel) {
-      window.mixpanel.track("Email Setup Page Viewed", {
-        referrer: document.referrer || 'direct',
-        time_of_day: new Date().getHours()
-      });
-    }
-  }, []);
+  useEffect(() => {  }, []);
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50">
@@ -45,14 +38,7 @@ export default function EmailSetupPage() {
                 <h1 className="text-3xl font-bold text-slate-900">Email & Collaboration Setup</h1>
                 <p className="text-slate-600 mt-1">Manage email accounts and distribution lists</p>
               </div>
-              <Button className="bg-orange-600 text-white hover:bg-orange-700 mt-4 md:mt-0" onClick={() => {
-                if (typeof window !== "undefined" && window.mixpanel) {
-                  window.mixpanel.track("Create Email Account Clicked", {
-                    source: 'email_setup_page',
-                    time_of_day: new Date().getHours()
-                  });
-                }
-              }}>
+              <Button className="bg-orange-600 text-white hover:bg-orange-700 mt-4 md:mt-0" onClick={() => {              }}>
                 <PlusIcon className="h-4 w-4 mr-2" />
                 Create Email Account
               </Button>

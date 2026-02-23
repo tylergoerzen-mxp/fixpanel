@@ -17,7 +17,6 @@ import {
   ActivityIcon,
   FlagIcon,
 } from "lucide-react";
-import { trackMicrositeSession } from "@/lib/analytics";
 
 export default function WellnessLanding() {
   const [showWheel, setShowWheel] = useState(false);
@@ -27,7 +26,6 @@ export default function WellnessLanding() {
     document.title = "ourHeart";
 
     // Track session start
-    trackMicrositeSession('ourHeart');
 
     // Fade in the wheel button after page loads
     setTimeout(() => {
@@ -62,11 +60,7 @@ export default function WellnessLanding() {
                   <Button
                     size="lg"
                     className="bg-white text-teal-700 hover:bg-teal-50 hover:bg-opacity-90 active:scale-95 transition-all"
-                    onClick={() => {
-                      if (typeof window !== "undefined" && window.mixpanel) {
-                        window.mixpanel.track("Wellness CTA Clicked", { cta: "Post Symptoms", location: "hero" });
-                      }
-                    }}
+                    onClick={() => {                    }}
                   >
                     <MessagesSquareIcon className="mr-2 h-5 w-5" />
                     Post Your Symptoms
@@ -77,11 +71,7 @@ export default function WellnessLanding() {
                     size="lg"
                     variant="outline"
                     className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-teal-700 active:scale-95 transition-all"
-                    onClick={() => {
-                      if (typeof window !== "undefined" && window.mixpanel) {
-                        window.mixpanel.track("Wellness CTA Clicked", { cta: "AI Doctor", location: "hero" });
-                      }
-                    }}
+                    onClick={() => {                    }}
                   >
                     <BrainIcon className="mr-2 h-5 w-5" />
                     Chat with AI Doctor
@@ -236,14 +226,7 @@ export default function WellnessLanding() {
                   <Button
                     size="lg"
                     className="bg-white text-teal-700 hover:bg-teal-50 hover:bg-opacity-90 active:scale-95 transition-all"
-                    onClick={() => {
-                      if (typeof window !== "undefined" && window.mixpanel) {
-                        window.mixpanel.track("Wellness CTA Clicked", {
-                          cta: "Get Started",
-                          location: "bottom_cta",
-                        });
-                      }
-                    }}
+                    onClick={() => {                    }}
                   >
                     Get Started
                   </Button>
@@ -253,14 +236,7 @@ export default function WellnessLanding() {
                     size="lg"
                     variant="outline"
                     className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-teal-700 active:scale-95 transition-all"
-                    onClick={() => {
-                      if (typeof window !== "undefined" && window.mixpanel) {
-                        window.mixpanel.track("Wellness CTA Clicked", {
-                          cta: "Start Voting",
-                          location: "bottom_cta",
-                        });
-                      }
-                    }}
+                    onClick={() => {                    }}
                   >
                     Start Voting
                   </Button>
@@ -276,14 +252,7 @@ export default function WellnessLanding() {
       {wheelButtonVisible && !showWheel && (
         <button
           onClick={() => {
-            setShowWheel(true);
-            if (typeof window !== "undefined" && window.mixpanel) {
-              window.mixpanel.track("Symptom Wheel Opened", {
-                source: 'landing_page',
-                time_on_page: Math.round((Date.now() - (window as any).pageLoadTime) / 1000) || 0
-              });
-            }
-          }}
+            setShowWheel(true);          }}
           className="fixed bottom-6 left-6 z-40 bg-gradient-to-r from-teal-600 to-emerald-600 text-white rounded-full p-4 shadow-2xl hover:shadow-3xl hover:scale-110 active:scale-95 transition-all duration-300 group animate-fade-in"
           style={{
             animation: 'fadeIn 0.5s ease-in',

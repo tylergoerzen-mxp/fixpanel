@@ -17,26 +17,11 @@ export default function SubmitPostPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.mixpanel) {
-      window.mixpanel.track("Lifestyle Submit Page Viewed", {
-        referrer: document.referrer || 'direct',
-        time_of_day: new Date().getHours()
-      });
-    }
-  }, []);
+  useEffect(() => {  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
-    if (typeof window !== "undefined" && window.mixpanel) {
-      window.mixpanel.track("Lifestyle Post Submitted", {
-        title: title,
-        content_length: content.length,
-        tags: tags,
-      });
-    }
 
     setTimeout(() => {
       setIsSubmitting(false);

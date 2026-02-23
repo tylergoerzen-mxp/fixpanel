@@ -3,14 +3,11 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { initMixpanelOnce, mixpanel } from "@/lib/analytics";
 import { XIcon, FlagIcon, PlayIcon, SparklesIcon, TrendingUpIcon, ClockIcon } from "lucide-react";
 
-const experimentId = "me-tube-video-recommender";
 type Variant = "A (meme engine)" | "B (demographics)" | "C (control)";
 const fallbackVariant: Variant = "C (control)";
 
-// Meme Engine - silly/zany videos
 const memeRecommendations = [
   { id: 28, thumbnail: "🎮", title: "Gaming Setup Tour 2024", reason: "Because you seem like the type who appreciates RGB lights and Mountain Dew" },
   { id: 36, thumbnail: "😂", title: "Stand-up Comedy Special", reason: "Your viewing history suggests you need a good laugh (or therapy)" },
@@ -22,7 +19,6 @@ const memeRecommendations = [
   { id: 10, thumbnail: "🍪", title: "Baking Chocolate Chip Cookies", reason: "Emotional support cookies for when the code won't compile" },
 ];
 
-// Demographics - based on made-up user profile
 const demographicsProfiles = [
   {
     age: "25-34",
@@ -66,7 +62,6 @@ const demographicsProfiles = [
   },
 ];
 
-// Control - latest videos only
 const controlRecommendations = [
   { id: 1, thumbnail: "🤖", title: "The Future of AI in 2025", reason: "This was uploaded recently" },
   { id: 2, thumbnail: "💻", title: "Web Development Crash Course", reason: "Latest in the Technology category" },
@@ -83,85 +78,18 @@ export interface VideoRecommenderModalProps {
 export function VideoRecommenderModal(props: VideoRecommenderModalProps) {
   const { onClose } = props;
   const router = useRouter();
-  const [variant, setVariant] = React.useState<Variant | null>(null);
-  const [recommendation, setRecommendation] = React.useState<any>(null);
-  const [demographicProfile, setDemographicProfile] = React.useState<any>(null);
-
-  React.useEffect(() => {
-    initMixpanelOnce();
-
-    // Add error handling for feature flag fetch
-    mixpanel.flags
-      .get_variant_value(experimentId, fallbackVariant)
-      .then((returnedVariant: unknown) => {
-        let v = returnedVariant as Variant;
-        if (!v || typeof v !== "string") v = fallbackVariant;
-        console.log("[MIXPANEL]: GOT FLAG (Video Recommender)", v);
-        setVariant(v);
-
-        // Generate recommendation based on variant
-        if (v === "A (meme engine)") {
-          const randomRec = memeRecommendations[Math.floor(Math.random() * memeRecommendations.length)];
-          setRecommendation(randomRec);
-        } else if (v === "B (demographics)") {
-          const randomProfile = demographicsProfiles[Math.floor(Math.random() * demographicsProfiles.length)];
-          const randomRec = randomProfile.recommendations[Math.floor(Math.random() * randomProfile.recommendations.length)];
-          setDemographicProfile(randomProfile);
-          setRecommendation(randomRec);
-        } else {
-          const randomRec = controlRecommendations[Math.floor(Math.random() * controlRecommendations.length)];
-          setRecommendation(randomRec);
-        }
-
-        mixpanel.track("Video Recommender Opened", { variant: v });
-      })
-      .catch((error: Error) => {
-        console.error("[MIXPANEL]: Error fetching feature flag:", error);
-        // Fallback to control variant on error
-        const v = fallbackVariant;
-        setVariant(v);
-        const randomRec = controlRecommendations[Math.floor(Math.random() * controlRecommendations.length)];
-        setRecommendation(randomRec);
-        mixpanel.track("Video Recommender Opened", { variant: v, error: "flag_fetch_failed" });
-      });
-  }, []);
+  const variant: Variant = fallbackVariant;
+  const recommendation = controlRecommendations[Math.floor(Math.random() * controlRecommendations.length)];
+  const demographicProfile = null;
 
   const handleWatchVideo = () => {
-    if (!recommendation || !variant) return;
-
-    mixpanel.track("Recommended Video Clicked", {
-      variant,
-      video_id: recommendation.id,
-      video_title: recommendation.title,
-    });
-
-    // Navigate to video (all play Rick Roll)
     router.push('/streaming/watch');
   };
 
   const handleClose = () => {
-    if (variant) {
-      mixpanel.track("Video Recommender Closed", { variant });
-    }
     onClose?.();
   };
 
-  // Show loading state while fetching flag
-  if (!variant || !recommendation) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center">
-        <div className="absolute inset-0 bg-black opacity-60" onClick={handleClose} />
-        <div className="relative z-10 bg-white rounded-lg shadow-2xl w-11/12 max-w-lg p-6">
-          <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#CC332B]"></div>
-          </div>
-          <p className="text-center text-gray-600 text-sm">Loading recommendation...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Different styles for each variant
   const variantStyles: Record<Variant, {
     modalBg: string;
     border: string;
@@ -172,14 +100,14 @@ export function VideoRecommenderModal(props: VideoRecommenderModalProps) {
     "A (meme engine)": {
       modalBg: "bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50",
       border: "border-4 border-purple-500",
-      accentColor: "#9333ea", // purple-600
+      accentColor: "#9333ea",
       badgeBg: "bg-purple-500 text-white",
       buttonBg: "bg-purple-600 hover:bg-purple-700",
     },
     "B (demographics)": {
       modalBg: "bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-50",
       border: "border-4 border-blue-500",
-      accentColor: "#2563eb", // blue-600
+      accentColor: "#2563eb",
       badgeBg: "bg-blue-500 text-white",
       buttonBg: "bg-blue-600 hover:bg-blue-700",
     },
@@ -192,14 +120,7 @@ export function VideoRecommenderModal(props: VideoRecommenderModalProps) {
     },
   };
 
-  // At this point, variant is guaranteed to be non-null due to early return above
-  const style = variantStyles[variant as Variant];
-
-  // Double check that style exists (should never happen due to early return, but TypeScript safety)
-  if (!style) {
-    console.error("[VideoRecommenderModal]: style is undefined for variant:", variant);
-    return null;
-  }
+  const style = variantStyles[variant];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -253,7 +174,7 @@ export function VideoRecommenderModal(props: VideoRecommenderModalProps) {
         {variant === "B (demographics)" && demographicProfile && (
           <div className="mb-4 p-4 bg-blue-100 rounded-lg border-2 border-blue-400">
             <p className="text-sm text-blue-900 font-semibold">
-              👤 <strong>Your Profile:</strong> {demographicProfile.gender}, {demographicProfile.age} years old, {demographicProfile.location}
+              👤 <strong>Your Profile:</strong> {(demographicProfile as any).gender}, {(demographicProfile as any).age} years old, {(demographicProfile as any).location}
             </p>
           </div>
         )}
@@ -311,28 +232,6 @@ export function VideoRecommenderModal(props: VideoRecommenderModalProps) {
             📊 Based on aggregated data from users similar to you
           </p>
         )}
-
-        <div className="flex justify-center gap-3 mt-3 text-xs">
-          <a
-            href="https://mixpanel.com/project/3276012/view/3782804/app/feature-flags/ddf7f839-1579-4e15-9dc2-a6f030a3770e"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:opacity-80 underline transition-colors"
-            style={{ color: style.accentColor }}
-          >
-            View Flag
-          </a>
-          <span className="text-gray-400">•</span>
-          <a
-            href="https://mixpanel.com/project/3276012/view/3782804/app/experiments/8f679182-b9f2-4894-b180-0debfb1cbbf1"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:opacity-80 underline transition-colors"
-            style={{ color: style.accentColor }}
-          >
-            View Experiment
-          </a>
-        </div>
       </div>
     </div>
   );

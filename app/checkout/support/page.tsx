@@ -105,28 +105,12 @@ export default function SupportPage() {
       [faqId]: isHelpful
     }));
 
-    // Track helpful votes
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('FAQ Helpful Vote', {
-        faq_id: faqId,
-        faq_question: faqs.find(f => f.id === faqId)?.question,
-        is_helpful: isHelpful
-      });
-    }
-  };
+    // Track helpful votes  };
 
   const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     // Track contact form submission
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Support Contact Form Submit', {
-        subject: contactForm.subject,
-        has_email: !!contactForm.email,
-        message_length: contactForm.message.length
-      });
-    }
-
     // Reset form
     setContactForm({ name: "", email: "", subject: "", message: "" });
 
@@ -150,13 +134,6 @@ export default function SupportPage() {
     setIsTyping(true);
 
     // Track chat interaction
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Support Chat Message', {
-        message_length: chatInput.length,
-        message_number: chatMessages.length
-      });
-    }
-
     // Simulate bot response
     setTimeout(() => {
       const responses = [
@@ -180,15 +157,7 @@ export default function SupportPage() {
   };
 
   // Track page view
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('View Support Page', {
-        referrer: document.referrer || 'direct',
-        time_of_day: new Date().getHours(),
-        has_active_cart: !!sessionStorage.getItem('theybuy_cart')
-      });
-    }
-  }, []);
+  useEffect(() => {  }, []);
 
   return (
     <div className="flex flex-col min-h-screen">

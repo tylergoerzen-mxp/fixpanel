@@ -110,14 +110,6 @@ export default function HistoryPage() {
 
   const handleVideoClick = (videoId: number) => {
     // Track video click from history
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('History Video Click', {
-        video_id: videoId,
-        video_title: history.find(v => v.id === videoId)?.title,
-        watch_percentage: history.find(v => v.id === videoId)?.percentage
-      });
-    }
-
     // Redirect to watch page
     router.push(`/streaming/watch?v=${videoId}`);
   };
@@ -129,13 +121,6 @@ export default function HistoryPage() {
     setClearAnimations(prev => ({ ...prev, [videoId]: true }));
 
     // Track removal
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Remove from History', {
-        video_id: videoId,
-        video_title: history.find(v => v.id === videoId)?.title
-      });
-    }
-
     // Remove after animation
     setTimeout(() => {
       setHistory(prev => prev.filter(v => v.id !== videoId));
@@ -144,12 +129,6 @@ export default function HistoryPage() {
   };
 
   const clearAllHistory = () => {
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Clear All History', {
-        items_cleared: history.length
-      });
-    }
-
     // Animate all items out
     const allIds = history.map(v => v.id);
     const animations = Object.fromEntries(allIds.map(id => [id, true]));
@@ -185,14 +164,7 @@ export default function HistoryPage() {
   }, {} as {[key: string]: typeof watchHistory});
 
   // Track page view
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('View History Page', {
-        total_videos: history.length,
-        completed_videos: history.filter(v => v.percentage === 100).length
-      });
-    }
-  }, [history]);
+  useEffect(() => {  }, [history]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -279,14 +251,7 @@ export default function HistoryPage() {
                 <Link href="/streaming">
                   <Button
                     className="bg-[#CC332B] hover:bg-[#CC332B]/90 active:scale-95 transition-all"
-                    onClick={() => {
-                      if (typeof window !== 'undefined' && window.mixpanel) {
-                        window.mixpanel.track('Button Clicked', {
-                          button_name: 'discover_videos',
-                          page: 'history'
-                        });
-                      }
-                    }}
+                    onClick={() => {                    }}
                   >
                     Discover Videos
                   </Button>

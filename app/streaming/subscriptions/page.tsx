@@ -94,14 +94,6 @@ export default function SubscriptionsPage() {
     }));
 
     // Track notification toggle
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Notification Toggle', {
-        channel_id: channelId,
-        channel_name: subscribedChannels.find(c => c.id === channelId)?.name,
-        enabled: !notifications[channelId]
-      });
-    }
-
     // Reset animation after delay
     setTimeout(() => {
       setBellAnimations(prev => ({
@@ -112,28 +104,14 @@ export default function SubscriptionsPage() {
   };
 
   const handleChannelClick = (channelId: number) => {
-    // Track channel click
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Subscription Channel Click', {
-        channel_id: channelId,
-        channel_name: subscribedChannels.find(c => c.id === channelId)?.name
-      });
-    }
-  };
+    // Track channel click  };
 
   const filteredChannels = subscribedChannels.filter(channel =>
     channel.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Track page view
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('View Subscriptions Page', {
-        total_subscriptions: subscribedChannels.length,
-        notifications_enabled: Object.values(notifications).filter(Boolean).length
-      });
-    }
-  }, [notifications]);
+  useEffect(() => {  }, [notifications]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -253,14 +231,7 @@ export default function SubscriptionsPage() {
                       variant="outline"
                       className="text-xs hover:bg-[#CC332B] hover:text-white hover:border-[#CC332B] transition-all active:scale-95"
                       onClick={(e) => {
-                        e.stopPropagation();
-                        if (typeof window !== 'undefined' && window.mixpanel) {
-                          window.mixpanel.track('View Channel Button Click', {
-                            channel_id: channel.id,
-                            channel_name: channel.name
-                          });
-                        }
-                      }}
+                        e.stopPropagation();                      }}
                     >
                       View Channel
                     </Button>

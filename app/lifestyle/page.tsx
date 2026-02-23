@@ -17,7 +17,6 @@ import {
   PlusIcon,
   FlagIcon,
 } from "lucide-react";
-import { trackMicrositeSession, waitForMixpanel } from "@/lib/analytics";
 
 // Extensive mock data for posts
 const initialPosts = [
@@ -320,24 +319,6 @@ export default function LifestyleLanding() {
   useEffect(() => {
     document.title = "theyRead";
 
-    // Track session start
-    trackMicrositeSession('theyRead');
-
-    // Track page view
-    const trackPageView = async () => {
-      try {
-        const mp = await waitForMixpanel();
-        mp.track("Lifestyle Landing Viewed", {
-          total_posts: posts.length,
-          tags_count: Array.from(new Set(posts.flatMap(p => p.tags))).length,
-          time_of_day: new Date().getHours()
-        });
-      } catch (error) {
-        console.error('[TRACKING]: Failed to track page view:', error);
-      }
-    };
-
-    trackPageView();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -352,13 +333,6 @@ export default function LifestyleLanding() {
       )
     );
     setVotedPosts(prev => new Set([...Array.from(prev), postId]));
-
-    if (typeof window !== "undefined" && window.mixpanel) {
-      window.mixpanel.track("Lifestyle Post Upvoted", {
-        post_id: postId,
-        post_title: posts.find(p => p.id === postId)?.title,
-      });
-    }
   };
 
   const handleDownvote = (postId: number) => {
@@ -372,13 +346,6 @@ export default function LifestyleLanding() {
       )
     );
     setVotedPosts(prev => new Set([...Array.from(prev), postId]));
-
-    if (typeof window !== "undefined" && window.mixpanel) {
-      window.mixpanel.track("Lifestyle Post Downvoted", {
-        post_id: postId,
-        post_title: posts.find(p => p.id === postId)?.title,
-      });
-    }
   };
 
   const getSortedPosts = () => {
@@ -424,14 +391,7 @@ export default function LifestyleLanding() {
                   <Button
                     size="lg"
                     className="bg-amber-600 text-zinc-900 hover:bg-amber-500 font-semibold hover:bg-opacity-90 active:scale-95 transition-all"
-                    onClick={() => {
-                      if (typeof window !== "undefined" && window.mixpanel) {
-                        window.mixpanel.track("Lifestyle CTA Clicked", {
-                          cta: "Create Post",
-                          location: "hero",
-                        });
-                      }
-                    }}
+                    onClick={() => {                    }}
                   >
                     <PlusIcon className="mr-2 h-5 w-5" />
                     Create Post
@@ -452,15 +412,7 @@ export default function LifestyleLanding() {
                   variant="outline"
                   className="bg-transparent border-2 border-amber-600 text-amber-400 hover:bg-amber-600 hover:text-zinc-900 hover:bg-opacity-90 active:scale-95 transition-all relative"
                   onClick={() => {
-                    setShowAnalyzer(true);
-                    if (typeof window !== "undefined" && window.mixpanel) {
-                      window.mixpanel.track("Post Analyzer Opened", {
-                        source: 'landing_page',
-                        total_posts: posts.length,
-                        voted_posts_count: votedPosts.size
-                      });
-                    }
-                  }}
+                    setShowAnalyzer(true);                  }}
                 >
                   <BrainIcon className="mr-2 h-5 w-5" />
                   Analyze Post
@@ -488,11 +440,7 @@ export default function LifestyleLanding() {
                       : "bg-transparent border-zinc-700 text-zinc-400 hover:bg-zinc-800"
                   }`}
                   onClick={() => {
-                    setSortBy("popular");
-                    if (typeof window !== "undefined" && window.mixpanel) {
-                      window.mixpanel.track("Lifestyle Sort Changed", { sort_type: "popular" });
-                    }
-                  }}
+                    setSortBy("popular");                  }}
                 >
                   <TrendingUpIcon className="mr-2 h-4 w-4" />
                   Popular
@@ -505,11 +453,7 @@ export default function LifestyleLanding() {
                       : "bg-transparent border-zinc-700 text-zinc-400 hover:bg-zinc-800"
                   }`}
                   onClick={() => {
-                    setSortBy("agree");
-                    if (typeof window !== "undefined" && window.mixpanel) {
-                      window.mixpanel.track("Lifestyle Sort Changed", { sort_type: "agree" });
-                    }
-                  }}
+                    setSortBy("agree");                  }}
                 >
                   <ArrowUpIcon className="mr-2 h-4 w-4" />
                   Likely to Agree
@@ -522,11 +466,7 @@ export default function LifestyleLanding() {
                       : "bg-transparent border-zinc-700 text-zinc-400 hover:bg-zinc-800"
                   }`}
                   onClick={() => {
-                    setSortBy("disagree");
-                    if (typeof window !== "undefined" && window.mixpanel) {
-                      window.mixpanel.track("Lifestyle Sort Changed", { sort_type: "disagree" });
-                    }
-                  }}
+                    setSortBy("disagree");                  }}
                 >
                   <ArrowDownIcon className="mr-2 h-4 w-4" />
                   Likely to Disagree
@@ -600,11 +540,7 @@ export default function LifestyleLanding() {
                           {post.tags.map((tag) => (
                             <button
                               key={tag}
-                              onClick={() => {
-                                if (typeof window !== "undefined" && window.mixpanel) {
-                                  window.mixpanel.track("Lifestyle Tag Clicked", { tag });
-                                }
-                                window.open("https://storage.googleapis.com/mp-customer-upload/RickRoll.mp4", "_blank");
+                              onClick={() => {                                window.open("https://storage.googleapis.com/mp-customer-upload/RickRoll.mp4", "_blank");
                               }}
                               className="px-2 py-1 bg-zinc-700 text-zinc-300 text-xs rounded-full border border-zinc-600 hover:bg-amber-600 hover:text-zinc-900 hover:border-amber-500 transition-colors cursor-pointer"
                             >
@@ -613,15 +549,7 @@ export default function LifestyleLanding() {
                           ))}
                         </div>
                         <button
-                          onClick={() => {
-                            if (typeof window !== "undefined" && window.mixpanel) {
-                              window.mixpanel.track("Lifestyle Comments Clicked", {
-                                post_id: post.id,
-                                displayed_count: post.comments,
-                                actual_count: 0, // MISMATCH FRICTION!
-                              });
-                            }
-                            // Show alert that comments failed to load (FRICTION!)
+                          onClick={() => {                            // Show alert that comments failed to load (FRICTION!)
                             alert("Unable to load comments. This post has 0 comments available.");
                           }}
                           className="flex items-center text-zinc-500 text-sm ml-auto hover:text-amber-500 transition-colors cursor-pointer"
@@ -678,11 +606,7 @@ export default function LifestyleLanding() {
               <Button
                 size="lg"
                 className="bg-amber-600 text-zinc-900 hover:bg-amber-500 font-semibold hover:bg-opacity-90 active:scale-95 transition-all"
-                onClick={() => {
-                  if (typeof window !== "undefined" && window.mixpanel) {
-                    window.mixpanel.track("Lifestyle CTA Clicked", { cta: "Start Posting", location: "bottom_cta" });
-                  }
-                }}
+                onClick={() => {                }}
               >
                 Start Posting
               </Button>

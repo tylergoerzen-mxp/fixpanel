@@ -10,17 +10,12 @@ import { ArrowRightIcon, ArrowLeftIcon, Wand2Icon, FlagIcon } from "lucide-react
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { KYCAutoFillModal } from "../KYCAutoFillModal";
-import { initMixpanelOnce, mixpanel } from "@/lib/analytics";
 
 export default function SignUpPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [showAutoFillModal, setShowAutoFillModal] = useState(false);
   const [completeClickCount, setCompleteClickCount] = useState(0);
-
-  useEffect(() => {
-    initMixpanelOnce();
-  }, []);
 
   const [formData, setFormData] = useState({
     // Page 1: Identity Verification
@@ -109,7 +104,6 @@ export default function SignUpPage() {
 
   const handleNext = () => {
     if (isStepValid()) {
-      mixpanel.track("KYC Next Button Clicked", { step, ...formData });
       setStep((prevStep) => prevStep + 1);
     }
   };
@@ -125,19 +119,12 @@ export default function SignUpPage() {
     const newClickCount = completeClickCount + 1;
     setCompleteClickCount(newClickCount);
 
-    mixpanel.track("Complete KYC Button Clicked", {
-      ...formData,
-      clickCount: newClickCount,
-      clicksRemaining: 10 - newClickCount
-    });
-
     if (newClickCount < 10) {
       console.log(`[KYC]: Click ${newClickCount}/10 - ${10 - newClickCount} more clicks needed`);
       return;
     }
 
     // After 10 clicks, actually submit
-    mixpanel.track("Complete KYC", formData);
     console.log("[KYC]: Form submitted after 10 clicks", formData);
 
     // Save the completed form data to sessionStorage for the success page

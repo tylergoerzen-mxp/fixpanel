@@ -73,14 +73,7 @@ export default function AboutPage() {
                   id="join"
                   className="hover:bg-opacity-90 active:scale-95 transition-all"
                   onClick={(e) => {
-                    e.stopPropagation();
-                    if (typeof window !== 'undefined' && window.mixpanel) {
-                      window.mixpanel.track('Button Clicked', {
-                        button_name: 'join_ibank',
-                        page: 'about'
-                      });
-                    }
-                  }}
+                    e.stopPropagation();                  }}
                 >
                   Join iBank Today
                 </Button>

@@ -44,22 +44,10 @@ export default function AccessControlPage() {
   const [accessRequests, setAccessRequests] = useState(initialAccessRequests);
   const [processingId, setProcessingId] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.mixpanel) {
-      window.mixpanel.track("Access Control Page Viewed");
-    }
-  }, []);
+  useEffect(() => {  }, []);
 
   const handleApprove = (request: typeof initialAccessRequests[0]) => {
     setProcessingId(request.id);
-
-    if (typeof window !== "undefined" && window.mixpanel) {
-      window.mixpanel.track("Access Request Approved", {
-        user: request.user,
-        service: request.service,
-        role: request.role,
-      });
-    }
 
     // Simulate API call with animation
     setTimeout(() => {
@@ -74,14 +62,6 @@ export default function AccessControlPage() {
 
   const handleReject = (request: typeof initialAccessRequests[0]) => {
     setProcessingId(request.id);
-
-    if (typeof window !== "undefined" && window.mixpanel) {
-      window.mixpanel.track("Access Request Rejected", {
-        user: request.user,
-        service: request.service,
-        role: request.role,
-      });
-    }
 
     // Simulate API call with animation
     setTimeout(() => {
@@ -107,11 +87,7 @@ export default function AccessControlPage() {
                 <p className="text-slate-600 mt-1">Manage user access and permissions across all services</p>
               </div>
               <Button className="bg-purple-600 text-white hover:bg-purple-700 hover:bg-opacity-90 active:scale-95 transition-all mt-4 md:mt-0" onClick={() => {
-                window.open("https://storage.googleapis.com/mp-customer-upload/RickRoll.mp4", "_blank");
-                if (typeof window !== "undefined" && window.mixpanel) {
-                  window.mixpanel.track("Bulk Provision Rickrolled");
-                }
-              }}>
+                window.open("https://storage.googleapis.com/mp-customer-upload/RickRoll.mp4", "_blank");              }}>
                 <ShieldCheckIcon className="h-4 w-4 mr-2" />
                 Bulk Provision
               </Button>
@@ -257,11 +233,7 @@ export default function AccessControlPage() {
                       variant="outline"
                       className="w-full mt-4 hover:bg-opacity-90 active:scale-95 transition-all"
                       onClick={() => {
-                        window.open("https://storage.googleapis.com/mp-customer-upload/RickRoll.mp4", "_blank");
-                        if (typeof window !== "undefined" && window.mixpanel) {
-                          window.mixpanel.track("Manage Service Access Rickrolled", { service: service.service });
-                        }
-                      }}
+                        window.open("https://storage.googleapis.com/mp-customer-upload/RickRoll.mp4", "_blank");                      }}
                     >
                       Manage Access
                     </Button>
@@ -292,11 +264,7 @@ export default function AccessControlPage() {
                       variant="outline"
                       className="w-full mt-4 hover:bg-opacity-90 active:scale-95 transition-all"
                       onClick={() => {
-                        window.open("https://storage.googleapis.com/mp-customer-upload/RickRoll.mp4", "_blank");
-                        if (typeof window !== "undefined" && window.mixpanel) {
-                          window.mixpanel.track("Manage Team Access Rickrolled", { team: team.name });
-                        }
-                      }}
+                        window.open("https://storage.googleapis.com/mp-customer-upload/RickRoll.mp4", "_blank");                      }}
                     >
                       Manage Team
                     </Button>

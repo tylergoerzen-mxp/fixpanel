@@ -26,15 +26,7 @@ export default function ChatPage() {
   const [shared, setShared] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.mixpanel) {
-      window.mixpanel.track("Wellness AI Chat Viewed", {
-        initial_message_count: messages.length,
-        referrer: document.referrer || 'direct',
-        time_of_day: new Date().getHours()
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -49,13 +41,6 @@ export default function ChatPage() {
     setInput("");
     setIsTyping(true);
 
-    if (typeof window !== "undefined" && window.mixpanel) {
-      window.mixpanel.track("Wellness AI Message Sent", {
-        message_length: userMessage.length,
-        conversation_length: messages.length,
-      });
-    }
-
     // Simulate AI response
     setTimeout(() => {
       const aiResponse = aiResponses[Math.floor(Math.random() * aiResponses.length)];
@@ -64,13 +49,7 @@ export default function ChatPage() {
     }, 1500);
   };
 
-  const handleShare = () => {
-    if (typeof window !== "undefined" && window.mixpanel) {
-      window.mixpanel.track("Wellness AI Diagnosis Shared", {
-        message_count: messages.length,
-      });
-    }
-    setShared(true);
+  const handleShare = () => {    setShared(true);
     setTimeout(() => setShared(false), 3000);
   };
 

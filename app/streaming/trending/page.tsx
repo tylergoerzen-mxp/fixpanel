@@ -84,14 +84,6 @@ export default function TrendingPage() {
 
   const handleVideoClick = (videoId: number) => {
     // Track video click
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Video Click', {
-        video_id: videoId,
-        page: 'trending',
-        video_title: trendingVideos.find(v => v.id === videoId)?.title
-      });
-    }
-
     // Redirect to watch page (they'll all be Rick Roll!)
     router.push(`/streaming/watch?v=${videoId}`);
   };
@@ -106,15 +98,7 @@ export default function TrendingPage() {
     }
     setLikedVideos(newLikedVideos);
 
-    // Track like action
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Video Like', {
-        video_id: videoId,
-        action: likedVideos.has(videoId) ? 'unlike' : 'like',
-        page: 'trending'
-      });
-    }
-  };
+    // Track like action  };
 
   // THE BROKEN SUBSCRIBE BUTTON! (10% success rate + drift)
   const handleSubscribe = (channel: string, event: React.MouseEvent) => {
@@ -122,14 +106,6 @@ export default function TrendingPage() {
     setClickCount(prev => prev + 1);
 
     // Track subscribe attempt
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Subscribe Attempted', {
-        channel: channel,
-        page: 'trending',
-        attempt_number: clickCount + 1
-      });
-    }
-
     // 90% failure rate - the UX issue we're demonstrating!
     const shouldWork = Math.random() < 0.1;
 
@@ -142,37 +118,12 @@ export default function TrendingPage() {
       }
       setSubscribedChannels(newSubscribed);
 
-      // Track successful subscription
-      if (typeof window !== 'undefined' && window.mixpanel) {
-        window.mixpanel.track('Subscribe Success', {
-          channel: channel,
-          page: 'trending',
-          attempt_number: clickCount + 1
-        });
-      }
-    } else {
-      // Track failed subscription
-      if (typeof window !== 'undefined' && window.mixpanel) {
-        window.mixpanel.track('Subscribe Failed', {
-          channel: channel,
-          page: 'trending',
-          attempt_number: clickCount + 1,
-          failure_reason: 'button_malfunction'
-        });
-      }
-    }
+      // Track successful subscription    } else {
+      // Track failed subscription    }
   };
 
   // Track page view
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('View Trending Page', {
-        video_count: trendingVideos.length,
-        time_of_day: new Date().getHours(),
-        day_of_week: new Date().toLocaleDateString('en-US', { weekday: 'long' })
-      });
-    }
-  }, []);
+  useEffect(() => {  }, []);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -278,14 +229,7 @@ export default function TrendingPage() {
                         variant="ghost"
                         className="flex items-center gap-1 hover:bg-gray-100 active:scale-95 transition-all"
                         onClick={(e) => {
-                          e.stopPropagation();
-                          if (typeof window !== 'undefined' && window.mixpanel) {
-                            window.mixpanel.track('Video Share', {
-                              video_id: video.id,
-                              page: 'trending'
-                            });
-                          }
-                        }}
+                          e.stopPropagation();                        }}
                       >
                         <ShareIcon className="h-4 w-4" />
                         <span className="text-xs">Share</span>

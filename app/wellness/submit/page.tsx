@@ -47,15 +47,7 @@ export default function SubmitPage() {
     }
   }, [username, age, duration, symptoms]);
 
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.mixpanel) {
-      window.mixpanel.track("Wellness Submit Page Viewed", {
-        has_saved_data: !!sessionStorage.getItem('wellness_submit_form'),
-        referrer: document.referrer || 'direct',
-        time_of_day: new Date().getHours()
-      });
-    }
-  }, []);
+  useEffect(() => {  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,31 +95,11 @@ export default function SubmitPage() {
       setValidationErrors(errors);
       setIsSubmitting(false);
 
-      // Track validation failures
-      if (typeof window !== "undefined" && window.mixpanel) {
-        window.mixpanel.track("Form Validation Failed", {
-          error_count: errors.length,
-          errors: errors,
-          username_length: username.length,
-          age: age,
-          duration_format: duration,
-          symptoms_length: symptoms.length,
-        });
-      }
-      return;
+      // Track validation failures      return;
     }
 
     setValidationErrors([]);
     setIsSubmitting(true);
-
-    if (typeof window !== "undefined" && window.mixpanel) {
-      window.mixpanel.track("Wellness Case Submitted", {
-        username: username,
-        age: age,
-        duration: duration,
-        symptoms_length: symptoms.length,
-      });
-    }
 
     setTimeout(() => {
       setIsSubmitting(false);

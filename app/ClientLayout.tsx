@@ -1,15 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
-import { usePathname } from "next/navigation";
-import { initMixpanelOnce } from "../lib/analytics";
+import { type ReactNode } from "react";
 
-export default function ClientLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-
-  useEffect(() => {
-    initMixpanelOnce();
-  }, [pathname]);
-
+export default function ClientLayout({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }

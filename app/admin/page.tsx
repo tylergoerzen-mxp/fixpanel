@@ -18,7 +18,6 @@ import {
   MessageCircleIcon,
   FlagIcon,
 } from "lucide-react";
-import { trackMicrositeSession } from "@/lib/analytics";
 
 export default function AdminLanding() {
   const [showChatbot, setShowChatbot] = useState(false);
@@ -27,7 +26,6 @@ export default function AdminLanding() {
     document.title = "youAdmin";
 
     // Track session start
-    trackMicrositeSession('youAdmin');
   }, []);
 
   return (
@@ -55,14 +53,7 @@ export default function AdminLanding() {
                     size="lg"
                     className="bg-blue-600 text-white hover:bg-blue-700 hover:bg-opacity-90 active:scale-95 transition-all"
                     id="adminSignIn"
-                    onClick={() => {
-                      if (typeof window !== "undefined" && window.mixpanel) {
-                        window.mixpanel.track("Admin Landing CTA Clicked", {
-                          cta: "Sign In",
-                          location: "hero",
-                        });
-                      }
-                    }}
+                    onClick={() => {                    }}
                   >
                     <LockIcon className="mr-2 h-5 w-5" />
                     Admin Sign In
@@ -74,14 +65,7 @@ export default function AdminLanding() {
                     variant="outline"
                     className="bg-white text-blue-900 border-blue-200 hover:bg-slate-100 active:scale-95 transition-all"
                     id="requestDemo"
-                    onClick={() => {
-                      if (typeof window !== "undefined" && window.mixpanel) {
-                        window.mixpanel.track("Admin Landing CTA Clicked", {
-                          cta: "Request Demo",
-                          location: "hero",
-                        });
-                      }
-                    }}
+                    onClick={() => {                    }}
                   >
                     Request Demo
                   </Button>
@@ -179,14 +163,7 @@ export default function AdminLanding() {
                   size="lg"
                   className="bg-blue-600 text-white hover:bg-blue-700 hover:bg-opacity-90 active:scale-95 transition-all"
                   id="getStarted"
-                  onClick={() => {
-                    if (typeof window !== "undefined" && window.mixpanel) {
-                      window.mixpanel.track("Admin Landing CTA Clicked", {
-                        cta: "Get Started",
-                        location: "features",
-                      });
-                    }
-                  }}
+                  onClick={() => {                  }}
                 >
                   Get Started with youAdmin
                 </Button>
@@ -236,14 +213,7 @@ export default function AdminLanding() {
                   size="lg"
                   className="bg-white text-blue-900 hover:bg-slate-100 hover:bg-opacity-90 active:scale-95 transition-all"
                   id="startTrial"
-                  onClick={() => {
-                    if (typeof window !== "undefined" && window.mixpanel) {
-                      window.mixpanel.track("Admin Landing CTA Clicked", {
-                        cta: "Start Free Trial",
-                        location: "bottom_cta",
-                      });
-                    }
-                  }}
+                  onClick={() => {                  }}
                 >
                   Start Your Free Trial
                 </Button>

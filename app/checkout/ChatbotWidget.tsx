@@ -3,15 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X, Send, Bot, User } from "lucide-react";
-import { initMixpanelOnce } from "@/lib/analytics";
 import { products } from "./products";
-
-// @ts-ignore
-declare global {
-  interface Window {
-    mixpanel: any;
-  }
-}
 
 interface Message {
   id: number;
@@ -114,37 +106,13 @@ export function ChatbotWidget() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [shouldShow, setShouldShow] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Check feature flag
-  useEffect(() => {
-    initMixpanelOnce();
-
-    // Check if feature flag is enabled
-    if (window.mixpanel?.flags) {
-      window.mixpanel.flags
-        .is_enabled('we_buy_chatbot', false)
-        .then((enabled: boolean) => {
-          setShouldShow(enabled);
-          if (enabled) {
-            console.log('[MIXPANEL]: Chatbot feature flag enabled');
-            window.mixpanel.track('Chatbot Loaded');
-          }
-        })
-        .catch((error: any) => {
-          console.error('[MIXPANEL]: Error checking chatbot flag:', error);
-        });
-    }
-  }, []);
-
-  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Welcome message when chat opens
   useEffect(() => {
     if (isOpen && messages.length === 0) {
       const welcomeMessage: Message = {
@@ -159,18 +127,10 @@ export function ChatbotWidget() {
 
   const handleOpen = () => {
     setIsOpen(true);
-    if (window.mixpanel) {
-      window.mixpanel.track('Chatbot Opened');
-    }
   };
 
   const handleClose = () => {
     setIsOpen(false);
-    if (window.mixpanel) {
-      window.mixpanel.track('Chatbot Closed', {
-        message_count: messages.length
-      });
-    }
   };
 
   const sendMessage = () => {
@@ -187,44 +147,31 @@ export function ChatbotWidget() {
     setInputValue("");
     setIsTyping(true);
 
-    // Track message sent
-    if (window.mixpanel) {
-      window.mixpanel.track('Chatbot Message Sent', {
-        message_text: inputValue.substring(0, 100), // Truncate for privacy
-        message_length: inputValue.length
-      });
-    }
-
-    // Simulate bot response with delay
     setTimeout(() => {
       generateBotResponse(inputValue);
       setIsTyping(false);
-    }, 1000 + Math.random() * 1000); // 1-2 seconds delay
+    }, 1000 + Math.random() * 1000);
   };
 
   const generateBotResponse = (userInput: string) => {
     let response = "";
     let recommendedProducts: typeof products | undefined;
 
-    // Check for matching triggers
     const matchedResponse = botResponses.find(r => r.trigger.test(userInput));
 
     if (matchedResponse) {
       response = matchedResponse.responses[Math.floor(Math.random() * matchedResponse.responses.length)];
 
-      // Add product recommendations if specified
       if ('recommendCategory' in matchedResponse) {
         recommendedProducts = products
           .filter(p => p.category === matchedResponse.recommendCategory)
-          .slice(0, 3); // Show top 3 products
+          .slice(0, 3);
       } else if (userInput.toLowerCase().includes('deal') || userInput.toLowerCase().includes('sale')) {
-        // Show random products for deals
         recommendedProducts = [...products]
           .sort(() => Math.random() - 0.5)
           .slice(0, 3);
       }
     } else {
-      // Use default response
       response = defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
     }
 
@@ -237,30 +184,11 @@ export function ChatbotWidget() {
     };
 
     setMessages(prev => [...prev, botMessage]);
-
-    // Track bot response
-    if (window.mixpanel) {
-      window.mixpanel.track('Chatbot Response Generated', {
-        has_recommendations: !!recommendedProducts,
-        recommendation_count: recommendedProducts?.length || 0
-      });
-    }
   };
 
   const handleProductClick = (product: typeof products[0]) => {
-    if (window.mixpanel) {
-      window.mixpanel.track('Chatbot Product Clicked', {
-        product_id: product.id,
-        product_name: product.name,
-        product_price: product.price,
-        product_category: product.category
-      });
-    }
-    // Could open product modal or navigate to product page
     window.location.href = `/checkout?product=${product.id}`;
   };
-
-  if (!shouldShow) return null;
 
   return (
     <>
@@ -276,7 +204,6 @@ export function ChatbotWidget() {
             onClick={handleOpen}
             className="fixed bottom-6 right-6 z-50 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full p-5 shadow-lg hover:shadow-xl transition-shadow"
           >
-            {/* Add wiggle animation to catch attention */}
             <motion.div
               animate={{
                 rotate: [0, -15, 15, -15, 15, 0],

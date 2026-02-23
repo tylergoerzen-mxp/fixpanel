@@ -2,14 +2,11 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { initMixpanelOnce, mixpanel } from "@/lib/analytics";
 import { XIcon, FlagIcon, ActivityIcon, RotateCwIcon } from "lucide-react";
 
-const experimentId = "our-heart-wheel-of-symptoms";
 type Variant = "fast wheel, many symptoms (A)" | "slow wheel, few symptoms (B)" | "control (C)";
 const fallbackVariant: Variant = "control (C)";
 
-// Many symptoms for variant A
 const manySymptoms = [
   "Headache", "Fever", "Cough", "Fatigue", "Nausea", "Dizziness",
   "Chest Pain", "Shortness of Breath", "Muscle Aches", "Sore Throat",
@@ -19,19 +16,16 @@ const manySymptoms = [
   "Skin Rash", "Itching", "Dry Mouth", "Blurred Vision", "Ear Pain",
 ];
 
-// Few symptoms for variant B
 const fewSymptoms = [
   "Headache", "Fever", "Cough", "Fatigue", "Nausea", "Dizziness",
 ];
 
-// Medium symptoms for control
 const mediumSymptoms = [
   "Headache", "Fever", "Cough", "Fatigue", "Nausea", "Dizziness",
   "Chest Pain", "Shortness of Breath", "Muscle Aches", "Sore Throat",
   "Runny Nose", "Congestion", "Chills", "Sweating", "Loss of Appetite",
 ];
 
-// Corresponding prognoses
 const prognoses: Record<string, string[]> = {
   "Headache": ["Tension headache - try resting in a dark room", "Possible migraine - consider reducing screen time", "Dehydration - drink more water!"],
   "Fever": ["Viral infection - rest and fluids recommended", "Common cold - over-the-counter medication may help", "Flu - monitor temperature and stay hydrated"],
@@ -71,35 +65,21 @@ export interface SymptomWheelModalProps {
 
 export function SymptomWheelModal(props: SymptomWheelModalProps) {
   const { onClose } = props;
-  const [variant, setVariant] = React.useState<Variant | null>(null);
+  const variant: Variant = fallbackVariant;
   const [isSpinning, setIsSpinning] = React.useState(false);
   const [result, setResult] = React.useState<{ symptom: string; prognosis: string } | null>(null);
   const [rotation, setRotation] = React.useState(0);
 
-  React.useEffect(() => {
-    initMixpanelOnce();
-    mixpanel.flags
-      .get_variant_value(experimentId, fallbackVariant)
-      .then((returnedVariant: unknown) => {
-        let v = returnedVariant as Variant;
-        if (!v || typeof v !== "string") v = fallbackVariant;
-        console.log("[MIXPANEL]: GOT FLAG (Symptom Wheel)", v);
-        setVariant(v);
-      });
-  }, []);
-
   const getSymptoms = () => {
-    if (!variant) return mediumSymptoms;
     if (variant === "fast wheel, many symptoms (A)") return manySymptoms;
     if (variant === "slow wheel, few symptoms (B)") return fewSymptoms;
     return mediumSymptoms;
   };
 
   const getSpinDuration = () => {
-    if (!variant) return 3000;
-    if (variant === "fast wheel, many symptoms (A)") return 1500; // Fast
-    if (variant === "slow wheel, few symptoms (B)") return 6000; // Slow
-    return 3000; // Medium
+    if (variant === "fast wheel, many symptoms (A)") return 1500;
+    if (variant === "slow wheel, few symptoms (B)") return 6000;
+    return 3000;
   };
 
   const handleSpin = () => {
@@ -115,12 +95,6 @@ export function SymptomWheelModal(props: SymptomWheelModalProps) {
 
     setRotation(finalRotation);
 
-    mixpanel.track("Symptom Wheel Spun", {
-      variant,
-      duration_ms: duration,
-      rotations,
-    });
-
     setTimeout(() => {
       const randomSymptom = symptoms[Math.floor(Math.random() * symptoms.length)];
       const prognosesForSymptom = prognoses[randomSymptom] || ["Consult a healthcare professional"];
@@ -128,21 +102,12 @@ export function SymptomWheelModal(props: SymptomWheelModalProps) {
 
       setResult({ symptom: randomSymptom, prognosis: randomPrognosis });
       setIsSpinning(false);
-
-      mixpanel.track("Symptom Wheel Result", {
-        variant,
-        symptom: randomSymptom,
-        prognosis: randomPrognosis,
-      });
     }, duration);
   };
 
   const handleClose = () => {
-    mixpanel.track("Symptom Wheel Closed", { variant, spun: result !== null });
     onClose?.();
   };
-
-  if (!variant) return null;
 
   const symptoms = getSymptoms();
   const segmentAngle = 360 / symptoms.length;
@@ -268,26 +233,6 @@ export function SymptomWheelModal(props: SymptomWheelModalProps) {
             </>
           )}
         </Button>
-
-        <div className="flex justify-center gap-3 mt-3 text-xs">
-          <a
-            href="https://mixpanel.com/project/3276012/view/3782804/app/feature-flags/293d35aa-b171-41a9-b64e-1dfb7d4eb6b6"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-slate-400 hover:text-teal-600 underline transition-colors"
-          >
-            View Flag
-          </a>
-          <span className="text-slate-300">•</span>
-          <a
-            href="https://mixpanel.com/project/3276012/view/3782804/app/experiments/dbb2b252-87bb-4fe7-8ddd-0d2197600736"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-slate-400 hover:text-teal-600 underline transition-colors"
-          >
-            View Experiment
-          </a>
-        </div>
       </div>
     </div>
   );

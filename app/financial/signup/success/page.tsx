@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2Icon, HomeIcon } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { initMixpanelOnce, mixpanel } from "@/lib/analytics";
 import Link from "next/link";
 
 export default function KYCSuccessPage() {
@@ -15,8 +14,6 @@ export default function KYCSuccessPage() {
   const [hasTracked, setHasTracked] = useState(false);
 
   useEffect(() => {
-    initMixpanelOnce();
-
     // Load the completed KYC data from sessionStorage
     if (typeof window !== 'undefined') {
       const completedData = sessionStorage.getItem('ibank_kyc_completed');
@@ -40,17 +37,6 @@ export default function KYCSuccessPage() {
 
   const handleComplete = () => {
     if (!formData || hasTracked) return;
-
-    // Fire the Complete KYC event with all form data
-    mixpanel.track('Complete KYC', {
-      citizenship_status: formData.citizenshipStatus,
-      employment_status: formData.employmentStatus,
-      annual_income: formData.annualIncome,
-      source_of_funds: formData.sourceOfFunds,
-      investment_experience: formData.investmentExperience,
-      risk_tolerance: formData.riskTolerance,
-      time_of_day: new Date().getHours(),
-    });
 
     setHasTracked(true);
 

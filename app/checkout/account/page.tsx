@@ -119,14 +119,7 @@ export default function AccountPage() {
     setIsEditing(false);
     setClickCount(prev => prev + 1);
 
-    // Track profile update
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Profile Update', {
-        fields_changed: 'contact_info',
-        edit_count: clickCount + 1
-      });
-    }
-  };
+    // Track profile update  };
 
   const handleNotificationToggle = (key: string) => {
     setNotifications(prev => ({
@@ -134,35 +127,13 @@ export default function AccountPage() {
       [key]: !prev[key as keyof typeof notifications]
     }));
 
-    // Track notification preference
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Notification Setting Change', {
-        notification_type: key,
-        enabled: !notifications[key as keyof typeof notifications]
-      });
-    }
-  };
+    // Track notification preference  };
 
   const removeFromWishlist = (itemId: number) => {
-    // Track wishlist removal
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Remove from Wishlist', {
-        product_id: itemId,
-        product_name: wishlistItems.find(item => item.id === itemId)?.name
-      });
-    }
-  };
+    // Track wishlist removal  };
 
   // Track page view
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('View Account Page', {
-        active_tab: activeTab,
-        total_orders: mockUser.totalOrders,
-        loyalty_points: mockUser.loyaltyPoints
-      });
-    }
-  }, [activeTab]);
+  useEffect(() => {  }, [activeTab]);
 
   const renderProfileTab = () => (
     <div className="space-y-6">

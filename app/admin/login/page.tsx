@@ -20,13 +20,6 @@ export default function AdminLogin() {
     // Show loader
     setIsLoading(true);
 
-    if (typeof window !== "undefined" && window.mixpanel) {
-      window.mixpanel.track("Admin Login Submitted", {
-        email_domain: email.split("@")[1] || "unknown",
-        has_password: password.length > 0,
-      });
-    }
-
     // Simulate auth with loader then redirect to dashboard
     setTimeout(() => {
       router.push("/admin/dashboard");
@@ -139,11 +132,7 @@ export default function AdminLogin() {
                 variant="outline"
                 className="w-full hover:bg-opacity-90 active:scale-95 transition-all"
                 disabled={isLoading}
-                onClick={() => {
-                  if (typeof window !== "undefined" && window.mixpanel) {
-                    window.mixpanel.track("Admin SSO Clicked", { provider: "Google" });
-                  }
-                  setIsLoading(true);
+                onClick={() => {                  setIsLoading(true);
                   setTimeout(() => router.push("/admin/dashboard"), 1500);
                 }}
               >
@@ -171,11 +160,7 @@ export default function AdminLogin() {
                 variant="outline"
                 className="w-full hover:bg-opacity-90 active:scale-95 transition-all"
                 disabled={isLoading}
-                onClick={() => {
-                  if (typeof window !== "undefined" && window.mixpanel) {
-                    window.mixpanel.track("Admin SSO Clicked", { provider: "Microsoft" });
-                  }
-                  setIsLoading(true);
+                onClick={() => {                  setIsLoading(true);
                   setTimeout(() => router.push("/admin/dashboard"), 1500);
                 }}
               >

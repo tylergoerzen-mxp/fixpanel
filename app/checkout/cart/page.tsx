@@ -84,14 +84,7 @@ export default function CartPage() {
       )
     );
 
-    // Track quantity update
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Cart Quantity Updated', {
-        product_id: id,
-        new_quantity: newQuantity
-      });
-    }
-  };
+    // Track quantity update  };
 
   const removeItem = (id: number) => {
     const item = cartItems.find(item => item.id === id);
@@ -102,14 +95,7 @@ export default function CartPage() {
     // Update cart items display
     setCartItems(prev => prev.filter(item => item.id !== id));
 
-    // Track item removal
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Remove from Cart', {
-        product_id: id,
-        product_name: item?.name
-      });
-    }
-  };
+    // Track item removal  };
 
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const discount = couponApplied ? subtotal * 0.15 : 0; // 15% discount
@@ -124,13 +110,6 @@ export default function CartPage() {
     setCouponError("");
 
     // Track coupon attempt
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Coupon Apply Attempted', {
-        coupon_code: couponCode,
-        cart_value: subtotal
-      });
-    }
-
     // Simulate network delay
     setTimeout(() => {
       // 90% failure rate - this is the UX issue we're demonstrating!
@@ -140,40 +119,17 @@ export default function CartPage() {
         setCouponApplied(true);
         setCouponError("");
 
-        // Track successful coupon application
-        if (typeof window !== 'undefined' && window.mixpanel) {
-          window.mixpanel.track('Coupon Applied Successfully', {
-            coupon_code: couponCode,
-            discount_amount: subtotal * 0.15,
-            cart_value: subtotal
-          });
-        }
-      } else {
+        // Track successful coupon application      } else {
         setCouponError("Unable to apply coupon. Please try again.");
 
-        // Track coupon failure
-        if (typeof window !== 'undefined' && window.mixpanel) {
-          window.mixpanel.track('Coupon Apply Failed', {
-            coupon_code: couponCode,
-            cart_value: subtotal,
-            error_reason: "system_error"
-          });
-        }
-      }
+        // Track coupon failure      }
 
       setIsApplyingCoupon(false);
     }, 1000);
   };
 
   // Track page view
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('View Cart', {
-        cart_item_count: cartItems.length,
-        cart_value: subtotal
-      });
-    }
-  }, [cartItems.length, subtotal]);
+  useEffect(() => {  }, [cartItems.length, subtotal]);
 
   return (
     <div className="flex flex-col min-h-screen">

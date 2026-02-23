@@ -89,16 +89,7 @@ export default function CheckoutPage() {
   }, []);
 
   // Track page views for each step
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('View Checkout', {
-        step: currentStep,
-        order_value: orderTotal,
-        item_count: cartItems.length,
-        cart_items: cartItems.map(item => item.name).join(', ')
-      });
-    }
-  }, [currentStep, orderTotal, cartItems]);
+  useEffect(() => {  }, [currentStep, orderTotal, cartItems]);
 
   // CHECKOUT BUTTON TIMEOUT - Random 30-45 second delay (only on step 3)
   useEffect(() => {
@@ -133,15 +124,6 @@ export default function CheckoutPage() {
     setCheckoutClickCount(newClickCount);
 
     // Track each click
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Checkout Button Clicked', {
-        order_value: orderTotal,
-        clickCount: newClickCount,
-        clicksRemaining: 10 - newClickCount,
-        item_count: cartItems.length
-      });
-    }
-
     if (newClickCount < 10) {
       console.log(`[CHECKOUT]: Click ${newClickCount}/10 - ${10 - newClickCount} more clicks needed`);
       return;
@@ -151,46 +133,12 @@ export default function CheckoutPage() {
     setIsProcessing(true);
 
     // Track checkout attempt
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Checkout Attempted', {
-        order_value: orderTotal,
-        payment_method: 'credit_card',
-        item_count: cartItems.length,
-        items: cartItems.map(item => ({
-          product_id: item.id,
-          name: item.name,
-          category: item.category,
-          price: item.price,
-          quantity: item.quantity
-        }))
-      });
-    }
-
     // Simulate payment processing
     setTimeout(() => {
       setOrderComplete(true);
       setIsProcessing(false);
 
-      // Track successful purchase with real cart data
-      if (typeof window !== 'undefined' && window.mixpanel) {
-        window.mixpanel.track('Purchase Completed', {
-          order_value: orderTotal,
-          order_id: `ORD-${Date.now()}`,
-          item_count: cartItems.length,
-          items: cartItems.map(item => ({
-            product_id: item.id,
-            name: item.name,
-            price: item.price,
-            quantity: item.quantity,
-            category: item.category
-          })),
-          subtotal: subtotal,
-          discount: discount,
-          shipping: shipping,
-          tax: tax
-        });
-      }
-    }, 3000);
+      // Track successful purchase with real cart data    }, 3000);
   };
 
   if (orderComplete) {

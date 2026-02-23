@@ -8,8 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { FlagsModal } from "./FlagsModal";
-import { trackMicrositeSession } from "@/lib/analytics";
-
 
 import {
   ChartBarIcon,
@@ -48,7 +46,6 @@ export default function HomePage() {
     document.title = "iBank";
 
     // Track session start
-    trackMicrositeSession('iBank');
 
     const taglines = [
       "Fix Your Finances with Data-Driven Insights.",

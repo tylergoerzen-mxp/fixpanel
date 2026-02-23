@@ -74,15 +74,7 @@ export default function VideoWatchPage() {
       setLikes(likes - 1); // Remove like
     }
 
-    // Track successful like action (PRECISION EVENT - only on success!)
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track(wasLiked ? 'Video Unliked' : 'Video Liked', {
-        video_title: videoTitle,
-        channel: channelName,
-        new_like_count: wasLiked ? likes - 1 : likes + 1
-      });
-    }
-  };
+    // Track successful like action (PRECISION EVENT - only on success!)  };
 
   const handleDislike = () => {
     // THE BROKEN DISLIKE BUTTON! 🐛
@@ -115,15 +107,7 @@ export default function VideoWatchPage() {
       setDislikes(dislikes - 1); // Remove dislike
     }
 
-    // Track successful dislike action (PRECISION EVENT - only on success!)
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track(wasDisliked ? 'Video Undisliked' : 'Video Disliked', {
-        video_title: videoTitle,
-        channel: channelName,
-        new_dislike_count: wasDisliked ? dislikes - 1 : dislikes + 1
-      });
-    }
-  };
+    // Track successful dislike action (PRECISION EVENT - only on success!)  };
 
   const handleSubscribe = () => {
     // THE BROKEN SUBSCRIBE BUTTON! 🐛
@@ -131,24 +115,8 @@ export default function VideoWatchPage() {
     const shouldWork = Math.random() < 0.1;
 
     // Track subscription attempt
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Subscribe Attempted', {
-        channel: channelName,
-        was_subscribed: isSubscribed,
-        source: 'video_page'
-      });
-    }
-
     if (!shouldWork) {
       // Track failed subscription
-      if (typeof window !== 'undefined' && window.mixpanel) {
-        window.mixpanel.track('Subscribe Failed', {
-          channel: channelName,
-          failure_reason: 'button_malfunction',
-          source: 'video_page'
-        });
-      }
-
       // Show failure animation
       setSubscribeButtonState('failed');
       setTimeout(() => setSubscribeButtonState('idle'), 600);
@@ -161,26 +129,12 @@ export default function VideoWatchPage() {
 
     setIsSubscribed(!isSubscribed);
 
-    // Track successful subscription
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track(isSubscribed ? 'Unsubscribed' : 'Subscribed', {
-        channel: channelName,
-        source: 'video_page'
-      });
-    }
-  };
+    // Track successful subscription  };
 
   const handleShare = () => {
     setIsShareModalOpen(true);
 
-    // Track share modal opened
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Share Modal Opened', {
-        video_title: videoTitle,
-        channel: channelName
-      });
-    }
-  };
+    // Track share modal opened  };
 
   const handleCopyLink = async () => {
     try {
@@ -188,28 +142,13 @@ export default function VideoWatchPage() {
       setCopyLinkSuccess(true);
       setTimeout(() => setCopyLinkSuccess(false), 2000);
 
-      // Track copy link
-      if (typeof window !== 'undefined' && window.mixpanel) {
-        window.mixpanel.track('Video Link Copied', {
-          video_title: videoTitle,
-          channel: channelName
-        });
-      }
-    } catch (err) {
+      // Track copy link    } catch (err) {
       console.error('Failed to copy:', err);
     }
   };
 
   const handleSocialShare = (platform: string) => {
     // Track social share
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Social Share Clicked', {
-        video_title: videoTitle,
-        channel: channelName,
-        platform: platform
-      });
-    }
-
     // Open share URLs
     const shareUrls: { [key: string]: string } = {
       twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(videoTitle)}&url=${encodeURIComponent(videoUrl)}`,
@@ -224,15 +163,7 @@ export default function VideoWatchPage() {
   };
 
   // Track video start
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Video Started', {
-        video_title: videoTitle,
-        channel: channelName,
-        source: 'video_page'
-      });
-    }
-  }, []);
+  useEffect(() => {  }, []);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -256,23 +187,9 @@ export default function VideoWatchPage() {
                   controls
                   autoPlay
                   onPlay={() => {
-                    // Track video play
-                    if (typeof window !== 'undefined' && window.mixpanel) {
-                      window.mixpanel.track('Video Play', {
-                        video_title: videoTitle,
-                        channel: channelName
-                      });
-                    }
-                  }}
+                    // Track video play                  }}
                   onPause={() => {
-                    // Track video pause
-                    if (typeof window !== 'undefined' && window.mixpanel) {
-                      window.mixpanel.track('Video Pause', {
-                        video_title: videoTitle,
-                        channel: channelName
-                      });
-                    }
-                  }}
+                    // Track video pause                  }}
                 >
                   <source src="https://storage.googleapis.com/mp-customer-upload/RickRoll.mp4" type="video/mp4" />
                   Your browser does not support the video tag.

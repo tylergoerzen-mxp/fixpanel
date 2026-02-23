@@ -2,10 +2,8 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { initMixpanelOnce, mixpanel } from "@/lib/analytics";
 import { XIcon, FlagIcon, QrCodeIcon, DatabaseIcon, CameraIcon, AlertCircleIcon } from "lucide-react";
 
-const experimentId = "i-bank-kyc-flow";
 type Variant = "A (QR code)" | "B (data fetch)" | "C (camera access)" | "D (control)";
 const fallbackVariant: Variant = "D (control)";
 
@@ -16,48 +14,25 @@ export interface KYCAutoFillModalProps {
 
 export function KYCAutoFillModal(props: KYCAutoFillModalProps) {
   const { onClose, onComplete } = props;
-  const [variant, setVariant] = React.useState<Variant | null>(null);
+  const variant: Variant = fallbackVariant;
   const [isProcessing, setIsProcessing] = React.useState(false);
 
-  React.useEffect(() => {
-    initMixpanelOnce();
-    mixpanel.flags
-      .get_variant_value(experimentId, fallbackVariant)
-      .then((returnedVariant: unknown) => {
-        let v = returnedVariant as Variant;
-        if (!v || typeof v !== "string") v = fallbackVariant;
-        console.log("[MIXPANEL]: GOT FLAG (KYC Auto-fill)", v);
-        setVariant(v);
-      })
-      .catch((error: Error) => {
-        console.error("[MIXPANEL]: Error fetching flag, using fallback", error);
-        setVariant(fallbackVariant);
-      });
-  }, []);
-
   const handleProcess = () => {
-    if (!variant) return;
-
     setIsProcessing(true);
-    mixpanel.track("KYC Auto-fill Attempted", { variant });
 
-    // Simulate processing
     setTimeout(() => {
       setIsProcessing(false);
       if (variant !== "D (control)") {
-        mixpanel.track("KYC Auto-fill Completed", { variant });
         onComplete?.();
       }
     }, 2000);
   };
 
   const handleClose = () => {
-    mixpanel.track("KYC Auto-fill Modal Closed", { variant });
     onClose?.();
   };
 
   const getContent = () => {
-    if (!variant) return null;
     switch (variant) {
       case "A (QR code)":
         return {
@@ -87,6 +62,7 @@ export function KYCAutoFillModal(props: KYCAutoFillModalProps) {
           color: "green",
         };
       case "D (control)":
+      default:
         return {
           icon: <AlertCircleIcon className="h-16 w-16 text-gray-600" />,
           title: "Auto-Fill Not Available",
@@ -99,10 +75,6 @@ export function KYCAutoFillModal(props: KYCAutoFillModalProps) {
 
   const content = getContent();
 
-  // Don't render until we have content
-  if (!content) return null;
-
-  // Get the appropriate flag icon color class (Tailwind doesn't support dynamic class names)
   const flagIconClass =
     content.color === "blue" ? "h-5 w-5 text-blue-600" :
     content.color === "purple" ? "h-5 w-5 text-purple-600" :
@@ -136,7 +108,7 @@ export function KYCAutoFillModal(props: KYCAutoFillModalProps) {
         <p className="text-gray-600 text-center mb-6">{content.description}</p>
 
         {/* Variant-specific content */}
-        {content.qrCode && (
+        {(content as any).qrCode && (
           <div className="bg-gray-100 rounded-lg p-8 mb-6 flex justify-center">
             <div className="w-48 h-48 bg-white border-4 border-blue-600 flex items-center justify-center">
               <div className="text-center">
@@ -147,7 +119,7 @@ export function KYCAutoFillModal(props: KYCAutoFillModalProps) {
           </div>
         )}
 
-        {content.ssnInput && (
+        {(content as any).ssnInput && (
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Social Security Number
@@ -161,7 +133,7 @@ export function KYCAutoFillModal(props: KYCAutoFillModalProps) {
           </div>
         )}
 
-        {content.cameraPreview && (
+        {(content as any).cameraPreview && (
           <div className="bg-gray-900 rounded-lg p-8 mb-6 flex justify-center">
             <div className="w-full h-48 bg-gray-800 flex items-center justify-center border-2 border-green-600">
               <div className="text-center">
@@ -176,7 +148,7 @@ export function KYCAutoFillModal(props: KYCAutoFillModalProps) {
         <Button
           onClick={variant === "D (control)" ? handleClose : handleProcess}
           disabled={isProcessing}
-		  id="auto-fill-action-button"
+          id="auto-fill-action-button"
           className={`w-full bg-${content.color}-600 hover:bg-${content.color}-700 text-white`}
           style={{
             backgroundColor:
@@ -194,26 +166,6 @@ export function KYCAutoFillModal(props: KYCAutoFillModalProps) {
             * This is a demo feature. No actual data will be collected.
           </p>
         )}
-
-        <div className="flex justify-center gap-3 mt-3 text-xs">
-          <a
-            href="https://mixpanel.com/project/3276012/view/3782804/app/feature-flags/7a8e2371-37ab-4e57-9f34-6f5ea0f9ad9b"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-gray-400 hover:text-purple-600 underline transition-colors"
-          >
-            View Flag
-          </a>
-          <span className="text-gray-300">•</span>
-          <a
-            href="https://mixpanel.com/project/3276012/view/3782804/app/experiments/6594af35-5405-41dd-b49f-d84b8a20e444"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-gray-400 hover:text-purple-600 underline transition-colors"
-          >
-            View Experiment
-          </a>
-        </div>
       </div>
     </div>
   );

@@ -2,14 +2,11 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { initMixpanelOnce, mixpanel } from "@/lib/analytics";
 import { XIcon, FlagIcon, BrainIcon, SparklesIcon, BookOpenIcon } from "lucide-react";
 
-const experimentId = "we-read-post-analyzer";
 type Variant = "present day engine (A)" | "historical engine (B)" | "control (C)";
 const fallbackVariant: Variant = "control (C)";
 
-// Present Day Engine - finds modern biases, thinks everything is AI
 const presentDayFindings = [
   { bias: "Silicon Valley Techno-Optimism", confidence: 94, aiProbability: 97 },
   { bias: "Late-Stage Capitalist Anxiety", confidence: 89, aiProbability: 95 },
@@ -28,7 +25,6 @@ const presentDayFindings = [
   { bias: "Remote Work Digital Nomad Ideology", confidence: 84, aiProbability: 91 },
 ];
 
-// Historical Engine - references classical philosophy, thinks nothing is AI
 const historicalFindings = [
   { influence: "Socratic Method of Inquiry", period: "Ancient Greece (470-399 BCE)", aiProbability: 12 },
   { influence: "Stoic Philosophy of Marcus Aurelius", period: "Roman Empire (121-180 CE)", aiProbability: 8 },
@@ -47,7 +43,6 @@ const historicalFindings = [
   { influence: "Humean Skepticism", period: "Scottish Enlightenment (1711-1776)", aiProbability: 10 },
 ];
 
-// Control Engine - never sure about anything
 const controlFindings = [
   "Unable to determine primary bias orientation",
   "Insufficient data for confident analysis",
@@ -67,30 +62,16 @@ export interface PostAnalyzerModalProps {
 
 export function PostAnalyzerModal(props: PostAnalyzerModalProps) {
   const { onClose } = props;
-  const [variant, setVariant] = React.useState<Variant | null>(null);
+  const variant: Variant = fallbackVariant;
   const [selectedPostId, setSelectedPostId] = React.useState("");
   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
   const [results, setResults] = React.useState<any>(null);
 
-  React.useEffect(() => {
-    initMixpanelOnce();
-    mixpanel.flags
-      .get_variant_value(experimentId, fallbackVariant)
-      .then((returnedVariant: unknown) => {
-        let v = returnedVariant as Variant;
-        if (!v || typeof v !== "string") v = fallbackVariant;
-        console.log("[MIXPANEL]: GOT FLAG (Post Analyzer)", v);
-        setVariant(v);
-      });
-  }, []);
-
   const handleAnalyze = () => {
-    if (!selectedPostId || !variant) return;
+    if (!selectedPostId) return;
 
     setIsAnalyzing(true);
-    mixpanel.track("Post Analysis Started", { variant, post_id: selectedPostId });
 
-    // Simulate analysis
     setTimeout(() => {
       let analysisResults;
 
@@ -133,20 +114,12 @@ export function PostAnalyzerModal(props: PostAnalyzerModalProps) {
 
       setResults(analysisResults);
       setIsAnalyzing(false);
-      mixpanel.track("Post Analysis Completed", {
-        variant,
-        post_id: selectedPostId,
-        ai_probability: analysisResults.aiProbability,
-      });
     }, 2000);
   };
 
   const handleClose = () => {
-    mixpanel.track("Post Analyzer Modal Closed", { variant, analyzed: !!results });
     onClose?.();
   };
-
-  if (!variant) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -290,26 +263,6 @@ export function PostAnalyzerModal(props: PostAnalyzerModalProps) {
             </Button>
           </div>
         )}
-
-        <div className="flex justify-center gap-3 mt-4 text-xs">
-          <a
-            href="https://mixpanel.com/project/3276012/view/3782804/app/feature-flags/a759f0e5-cd4e-4458-b24c-a786a045cf12"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-zinc-500 hover:text-amber-500 underline transition-colors"
-          >
-            View Flag
-          </a>
-          <span className="text-zinc-300">•</span>
-          <a
-            href="https://mixpanel.com/project/3276012/view/3782804/app/experiments/2256ed85-ac9b-4844-aa39-c2af8060cb98"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-zinc-500 hover:text-amber-500 underline transition-colors"
-          >
-            View Experiment
-          </a>
-        </div>
       </div>
     </div>
   );

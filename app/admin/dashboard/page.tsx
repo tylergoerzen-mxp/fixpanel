@@ -19,16 +19,7 @@ import {
 } from "lucide-react";
 
 export default function AdminDashboard() {
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.mixpanel) {
-      window.mixpanel.track("Admin Dashboard Viewed", {
-        total_employees: stats.totalEmployees,
-        active_employees: stats.activeEmployees,
-        pending_onboarding: stats.pendingOnboarding,
-        referrer: document.referrer || 'direct'
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const stats = {
@@ -86,11 +77,7 @@ export default function AdminDashboard() {
                 <Button
                   variant="outline"
                   className="hover:bg-opacity-90 active:scale-95 transition-all"
-                  onClick={() => {
-                    if (typeof window !== "undefined" && window.mixpanel) {
-                      window.mixpanel.track("Dashboard Quick Action", { action: "Search" });
-                    }
-                  }}
+                  onClick={() => {                  }}
                 >
                   <SearchIcon className="h-4 w-4 mr-2" />
                   Search
@@ -98,11 +85,7 @@ export default function AdminDashboard() {
                 <Link href="/admin/employees">
                   <Button
                     className="bg-blue-600 text-white hover:bg-blue-700 hover:bg-opacity-90 active:scale-95 transition-all"
-                    onClick={() => {
-                      if (typeof window !== "undefined" && window.mixpanel) {
-                        window.mixpanel.track("Dashboard Quick Action", { action: "Add Employee" });
-                      }
-                    }}
+                    onClick={() => {                    }}
                   >
                     <PlusIcon className="h-4 w-4 mr-2" />
                     Add Employee
@@ -239,14 +222,7 @@ export default function AdminDashboard() {
                     <div
                       key={idx}
                       className="flex items-center justify-between p-4 rounded-lg border border-slate-200 hover:border-blue-300 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
-                      onClick={() => {
-                        if (typeof window !== "undefined" && window.mixpanel) {
-                          window.mixpanel.track("Pending Action Clicked", {
-                            action_type: action.type,
-                            priority: action.priority,
-                          });
-                        }
-                      }}
+                      onClick={() => {                      }}
                     >
                       <div>
                         <p className="text-sm font-medium text-slate-900">{action.type}</p>
@@ -305,11 +281,7 @@ export default function AdminDashboard() {
               <Link href="/admin/employees" className="block">
                 <div
                   className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
-                  onClick={() => {
-                    if (typeof window !== "undefined" && window.mixpanel) {
-                      window.mixpanel.track("Quick Action Clicked", { action: "Manage Employees" });
-                    }
-                  }}
+                  onClick={() => {                  }}
                 >
                   <UsersIcon className="h-8 w-8 text-blue-600 mb-3" />
                   <h3 className="font-medium text-slate-900">Manage Employees</h3>
@@ -320,11 +292,7 @@ export default function AdminDashboard() {
               <Link href="/admin/access" className="block">
                 <div
                   className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
-                  onClick={() => {
-                    if (typeof window !== "undefined" && window.mixpanel) {
-                      window.mixpanel.track("Quick Action Clicked", { action: "Access Control" });
-                    }
-                  }}
+                  onClick={() => {                  }}
                 >
                   <ShieldCheckIcon className="h-8 w-8 text-purple-600 mb-3" />
                   <h3 className="font-medium text-slate-900">Access Control</h3>
@@ -335,11 +303,7 @@ export default function AdminDashboard() {
               <Link href="/admin/email" className="block">
                 <div
                   className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
-                  onClick={() => {
-                    if (typeof window !== "undefined" && window.mixpanel) {
-                      window.mixpanel.track("Quick Action Clicked", { action: "Email Setup" });
-                    }
-                  }}
+                  onClick={() => {                  }}
                 >
                   <MailIcon className="h-8 w-8 text-orange-600 mb-3" />
                   <h3 className="font-medium text-slate-900">Email Setup</h3>
@@ -350,11 +314,7 @@ export default function AdminDashboard() {
               <Link href="/admin/analytics" className="block">
                 <div
                   className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
-                  onClick={() => {
-                    if (typeof window !== "undefined" && window.mixpanel) {
-                      window.mixpanel.track("Quick Action Clicked", { action: "Analytics" });
-                    }
-                  }}
+                  onClick={() => {                  }}
                 >
                   <BarChartIcon className="h-8 w-8 text-cyan-600 mb-3" />
                   <h3 className="font-medium text-slate-900">Analytics</h3>

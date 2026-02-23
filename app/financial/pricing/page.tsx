@@ -12,7 +12,6 @@ export default function PricingPage() {
     
   }, []);
 
-
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -53,14 +52,7 @@ export default function PricingPage() {
                   id="getStarted"
                   className="mt-6 hover:bg-opacity-90 active:scale-95 transition-all"
                   onClick={(e) => {
-                    e.stopPropagation();
-                    if (typeof window !== 'undefined' && window.mixpanel) {
-                      window.mixpanel.track('Button Clicked', {
-                        button_name: 'get_started_basic',
-                        page: 'pricing'
-                      });
-                    }
-                  }}
+                    e.stopPropagation();                  }}
                 >
                   Get Started
                 </Button>
@@ -95,14 +87,7 @@ export default function PricingPage() {
                     id="trial"
                     className="mt-6 hover:bg-opacity-90 active:scale-95 transition-all"
                     onClick={(e) => {
-                      e.stopPropagation();
-                      if (typeof window !== 'undefined' && window.mixpanel) {
-                        window.mixpanel.track('Button Clicked', {
-                          button_name: 'start_trial',
-                          page: 'pricing'
-                        });
-                      }
-                    }}
+                      e.stopPropagation();                    }}
                   >
                     Start Free Trial
                   </Button>
@@ -137,14 +122,7 @@ export default function PricingPage() {
                   id="contactSales"
                   className="mt-6 hover:bg-opacity-90 active:scale-95 transition-all"
                   onClick={(e) => {
-                    e.stopPropagation();
-                    if (typeof window !== 'undefined' && window.mixpanel) {
-                      window.mixpanel.track('Button Clicked', {
-                        button_name: 'contact_sales',
-                        page: 'pricing'
-                      });
-                    }
-                  }}
+                    e.stopPropagation();                  }}
                 >
                   Contact Sales
                 </Button>

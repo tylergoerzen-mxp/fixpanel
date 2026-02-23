@@ -3,7 +3,6 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { initMixpanelOnce, mixpanel } from "@/lib/analytics";
 import fooImage from "../images/foo.png";
 import barImage from "../images/bar.png";
 import bazImage from "../images/baz.png";
@@ -25,8 +24,7 @@ export interface FlagsModalProps extends Partial<ContentProps> {
   onConfirm?: () => void;
 }
 
-const experimentId = "exp_customerStory"; //? https://bit.ly/43siFeM (Mixpanel Flag Key!)
-type Variant = "no story (D)" | "sarah story (A)" | "marco portfolio (B)" | "priya debt (C)" ; // ? mixpanel flag values
+type Variant = "no story (D)" | "sarah story (A)" | "marco portfolio (B)" | "priya debt (C)";
 const fallbackVariant: Variant = "no story (D)";
 
 const getModalData = (v?: Variant): ContentProps => {
@@ -68,6 +66,7 @@ const getModalData = (v?: Variant): ContentProps => {
         imgUrl: bazImage.src,
       };
     case "no story (D)":
+    default:
       return {
         headline: 'Join Thousands of Success Stories',
         tagline: "— Our Community [Variant D]",
@@ -78,57 +77,27 @@ const getModalData = (v?: Variant): ContentProps => {
         cancelText: "Dismiss",
         confirmText: "Explore Testimonials",
       };
-    default:
-      // empty until we've fetched
-      return {};
   }
 };
 
 export function FlagsModal(props: FlagsModalProps) {
   const { onClose, onConfirm, ...overrides } = props;
   const router = useRouter();
-  // if user didn't supply onConfirm, navigate to /financial/testimonials
   const handleConfirm = onConfirm ?? (() => router.push("/financial/testimonials"));
 
-  // start empty
-  const [modalData, setModalData] = React.useState<ContentProps>(() => getModalData());
+  const modalData = getModalData(fallbackVariant);
 
-  React.useEffect(() => {
-    mixpanel.flags
-      .get_variant_value(experimentId, fallbackVariant) // ! look for a feature flag for the experiment + user
-      .then((returnedVariant: unknown) => {
-        let variant = returnedVariant as Variant;
-        if (!variant || typeof variant !== "string") variant = "no story (D)";
-        console.log("[MIXPANEL]: GOT FLAG", variant);
-        if (variant) setModalData(getModalData(variant)); // ! use the variant to the app
-      })
-      .catch((error: Error) => {
-        console.error("[MIXPANEL]: Error fetching flag, using fallback", error);
-        setModalData(getModalData(fallbackVariant));
-      });
-  }, []);
-
-  // have we loaded anything yet?
-  const isLoaded = Object.keys(modalData).length > 1;
-
-  // props override flag data
   const { headline, tagline, copy, color, bgColor, copyColor, cancelText, confirmText, imgUrl } = {
     ...modalData,
     ...overrides,
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{
-        opacity: isLoaded ? 1 : 0,
-        transition: "opacity 2s ease-in-out",
-      }}
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* backdrop */}
       <div className="absolute inset-0 bg-black opacity-50" onClick={onClose} />
 
-      {/* panel: always in the DOM, but opacity goes 0→1 when loaded */}
+      {/* panel */}
       <div
         className="rounded-lg shadow-xl z-10 w-11/12 max-w-md p-6"
         style={{
@@ -137,42 +106,18 @@ export function FlagsModal(props: FlagsModalProps) {
           color: copyColor,
         }}
       >
-        {/* only show children once we have data */}
-        {isLoaded && (
-          <div>
-            <h2 className="text-2xl font-bold mb-2">{headline}</h2>
-            {tagline && <h3 className="text-lg font-semibold mb-4">{tagline}</h3>}
-            {imgUrl && <img src={imgUrl} alt="" className="mb-4 w-auto max-h-24 object-cover rounded mx-auto" />}
-            {copy && <p className="text-base mb-6">{copy}</p>}
-            <div className="flex justify-end space-x-3">
-              <Button variant="outline" onClick={onClose}>
-                {cancelText}
-              </Button>
-              <Button onClick={handleConfirm} id="confirm-button">{confirmText}</Button>
-            </div>
-            <div className="flex justify-center gap-3 mt-4 text-xs">
-              <a
-                href="https://mixpanel.com/project/3276012/view/3782804/app/feature-flags/c4bf3cf0-658f-486c-b403-14d5535f4661"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:underline transition-colors"
-                style={{ color: copyColor }}
-              >
-                View Flag
-              </a>
-              <span style={{ opacity: 0.5 }}>•</span>
-              <a
-                href="https://mixpanel.com/project/3276012/view/3782804/app/experiments/568e5655-085e-4de9-bb5f-c7de888e0d7d"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:underline transition-colors"
-                style={{ color: copyColor }}
-              >
-                View Experiment
-              </a>
-            </div>
+        <div>
+          <h2 className="text-2xl font-bold mb-2">{headline}</h2>
+          {tagline && <h3 className="text-lg font-semibold mb-4">{tagline}</h3>}
+          {imgUrl && <img src={imgUrl} alt="" className="mb-4 w-auto max-h-24 object-cover rounded mx-auto" />}
+          {copy && <p className="text-base mb-6">{copy}</p>}
+          <div className="flex justify-end space-x-3">
+            <Button variant="outline" onClick={onClose}>
+              {cancelText}
+            </Button>
+            <Button onClick={handleConfirm} id="confirm-button">{confirmText}</Button>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

@@ -81,16 +81,7 @@ export default function VotePage() {
   const [selectedVote, setSelectedVote] = useState<string | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.mixpanel) {
-      window.mixpanel.track("Wellness Vote Page Viewed", {
-        total_cases: cases.length,
-        current_case_index: currentCase,
-        voted_count: votedOn.size,
-        referrer: document.referrer || 'direct'
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const currentCaseData = cases[currentCase];
@@ -99,14 +90,6 @@ export default function VotePage() {
   const handleVote = (diagnosis: string) => {
     setIsAnimating(true);
     setSelectedVote(diagnosis);
-
-    if (typeof window !== "undefined" && window.mixpanel) {
-      window.mixpanel.track("Wellness Case Vote", {
-        case_id: currentCaseData.id,
-        diagnosis: diagnosis,
-        username: currentCaseData.username,
-      });
-    }
 
     // Update vote count for this diagnosis
     setTimeout(() => {

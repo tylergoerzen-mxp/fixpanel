@@ -6,12 +6,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Send, Download, Share2, Sparkles, ListVideo, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { initMixpanelOnce, mixpanel } from "@/lib/analytics";
 import { searchVideos, getRandomVideos, Video } from "./videoData";
 
-const experimentId = "me-tube-ai-playlist-maker";
 type Variant = "Control" | "A (greedy bot)" | "B (stingy bot)";
-const fallbackVariant: Variant = "Control";
 
 interface AIPersonality {
   name: string;
@@ -56,55 +53,18 @@ const personalities: Record<string, AIPersonality> = {
 export function AIPlaylistBuilder() {
   const router = useRouter();
   const [isOpen, setIsOpen] = React.useState(false);
-  const [variant, setVariant] = React.useState<Variant | null>(null);
-  const [personality, setPersonality] = React.useState<AIPersonality>(personalities.control);
+  const personality = personalities.control;
   const [userPrompt, setUserPrompt] = React.useState("");
   const [playlist, setPlaylist] = React.useState<Video[]>([]);
   const [isGenerating, setIsGenerating] = React.useState(false);
   const [hasGenerated, setHasGenerated] = React.useState(false);
 
-  React.useEffect(() => {
-    initMixpanelOnce();
-
-    mixpanel.flags
-      .get_variant_value(experimentId, fallbackVariant)
-      .then((returnedVariant: unknown) => {
-        let v = returnedVariant as Variant;
-        if (!v || typeof v !== "string") v = fallbackVariant;
-
-        console.log("[MIXPANEL]: GOT FLAG (AI Playlist Maker)", v);
-        setVariant(v);
-
-        // Set personality based on variant
-        const variantStr = String(v).toLowerCase();
-        if (variantStr.includes("greedy") || variantStr.includes("a (")) {
-          setPersonality(personalities.greedy);
-        } else if (variantStr.includes("stingy") || variantStr.includes("b (")) {
-          setPersonality(personalities.stingy);
-        } else {
-          setPersonality(personalities.control);
-        }
-
-        mixpanel.track("AI Playlist Builder Loaded", { variant: v });
-      });
-  }, []);
-
   const handleOpen = () => {
     setIsOpen(true);
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('AI Playlist Builder Opened', { variant });
-    }
   };
 
   const handleClose = () => {
     setIsOpen(false);
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('AI Playlist Builder Closed', {
-        variant,
-        had_playlist: playlist.length > 0,
-        playlist_size: playlist.length,
-      });
-    }
   };
 
   const generatePlaylist = async () => {
@@ -113,28 +73,15 @@ export function AIPlaylistBuilder() {
     setIsGenerating(true);
     setHasGenerated(false);
 
-    // Track generation attempt
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('AI Playlist Generation Started', {
-        variant,
-        prompt: userPrompt,
-        personality: personality.name,
-      });
-    }
-
-    // Simulate AI thinking delay
     await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000));
 
-    // Generate playlist based on personality
     const playlistSize = Math.floor(
       Math.random() * (personality.playlistSize.max - personality.playlistSize.min + 1) +
       personality.playlistSize.min
     );
 
-    // Search for relevant videos based on prompt
     const searchResults = searchVideos(userPrompt, Math.min(playlistSize * 2, 30));
 
-    // If not enough search results, add random videos
     let generatedPlaylist: Video[];
     if (searchResults.length >= playlistSize) {
       generatedPlaylist = searchResults.slice(0, playlistSize);
@@ -146,20 +93,9 @@ export function AIPlaylistBuilder() {
     setPlaylist(generatedPlaylist);
     setIsGenerating(false);
     setHasGenerated(true);
-
-    // Track successful generation
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('AI Playlist Generated', {
-        variant,
-        prompt: userPrompt,
-        playlist_size: generatedPlaylist.length,
-        personality: personality.name,
-      });
-    }
   };
 
   const handleSavePlaylist = () => {
-    // Create playlist data
     const playlistData = {
       name: `${userPrompt} - AI Playlist`,
       created: new Date().toISOString(),
@@ -167,7 +103,6 @@ export function AIPlaylistBuilder() {
       personality: personality.name,
     };
 
-    // Download as JSON
     const blob = new Blob([JSON.stringify(playlistData, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -175,50 +110,17 @@ export function AIPlaylistBuilder() {
     a.download = `${userPrompt.replace(/[^a-z0-9]/gi, '_')}_playlist.json`;
     a.click();
     URL.revokeObjectURL(url);
-
-    // Track save event (KEY SUCCESS METRIC!)
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Playlist Saved', {
-        variant,
-        prompt: userPrompt,
-        playlist_size: playlist.length,
-        personality: personality.name,
-      });
-    }
   };
 
   const handleExportPlaylist = () => {
-    // Copy playlist to clipboard as formatted text
     const playlistText = `${userPrompt} - AI Playlist\n\n` +
       playlist.map((v, i) => `${i + 1}. ${v.title} - ${v.channel} (${v.duration})`).join('\n');
 
     navigator.clipboard.writeText(playlistText);
-
-    // Track export event (KEY SUCCESS METRIC!)
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Playlist Exported', {
-        variant,
-        prompt: userPrompt,
-        playlist_size: playlist.length,
-        personality: personality.name,
-      });
-    }
-
     alert('Playlist copied to clipboard!');
   };
 
   const handleVideoClick = (video: Video) => {
-    // Track video click from playlist
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('Playlist Video Clicked', {
-        variant,
-        video_id: video.id,
-        video_title: video.title,
-        playlist_prompt: userPrompt,
-      });
-    }
-
-    // Redirect to Rick Roll (every video!)
     router.push(`/streaming/watch?v=rickroll`);
   };
 
@@ -345,7 +247,6 @@ export function AIPlaylistBuilder() {
                   >
                     {/* Response Message */}
                     <div className={`mb-4 p-4 rounded-lg bg-gradient-to-r ${personality.bgGradient} bg-opacity-10`}>
-						{/* todo: used personality.color somewhere else */}
                       <p className="font-semibold text-white">
                         {personality.responsePrefix} for "{userPrompt}"! ({playlist.length} videos)
                       </p>
@@ -413,30 +314,9 @@ export function AIPlaylistBuilder() {
 
               {/* Footer */}
               <div className="p-4 border-t border-gray-200 bg-gray-50 rounded-b-lg">
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-center gap-1 text-xs text-gray-500">
-                    <Sparkles className="h-3 w-3" />
-                    <span>Powered by {personality.name} AI & Feature Flags</span>
-                  </div>
-                  <div className="flex justify-center gap-3 text-xs">
-                    <a
-                      href="https://mixpanel.com/project/3276012/view/3782804/app/feature-flags/41387f87-eb9e-4e01-b22a-c51411995e01"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gray-500 hover:text-gray-700 underline transition-colors"
-                    >
-                      View Flag
-                    </a>
-                    <span className="text-gray-300">•</span>
-                    <a
-                      href="https://mixpanel.com/project/3276012/view/3782804/app/experiments/a7b28c8a-5cc7-468b-8466-e2e7e421d32d"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gray-500 hover:text-gray-700 underline transition-colors"
-                    >
-                      View Experiment
-                    </a>
-                  </div>
+                <div className="flex items-center justify-center gap-1 text-xs text-gray-500">
+                  <Sparkles className="h-3 w-3" />
+                  <span>Powered by {personality.name} AI</span>
                 </div>
               </div>
             </motion.div>

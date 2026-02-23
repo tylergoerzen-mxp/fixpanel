@@ -190,34 +190,14 @@ export default function DealsPage() {
       localStorage.setItem('theybuy_cart', JSON.stringify(newCart));
     }
 
-    // Track add to cart from deals
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      const deal = dailyDeals.find(d => d.id === dealId);
-      window.mixpanel.track('Add to Cart', {
-        product_id: dealId,
-        product_name: deal?.name,
-        price: deal?.salePrice,
-        original_price: deal?.originalPrice,
-        discount_percentage: deal?.discount,
-        source: 'daily_deals',
-        time_remaining: timers[dealId]
-      });
-    }
-  };
+    // Track add to cart from deals  };
 
   const getCartItemCount = useCallback(() => {
     return cart.reduce((total, item) => total + item.quantity, 0);
   }, [cart]);
 
   // Track page view
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.mixpanel) {
-      window.mixpanel.track('View Daily Deals Page', {
-        total_deals: dailyDeals.length,
-        cart_items: getCartItemCount()
-      });
-    }
-  }, [getCartItemCount]);
+  useEffect(() => {  }, [getCartItemCount]);
 
   return (
     <div className="flex flex-col min-h-screen">
