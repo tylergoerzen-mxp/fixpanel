@@ -25,17 +25,14 @@ export function ConsentBanner() {
   useEffect(() => {
     if (!mounted || typeof window === "undefined") return;
     const token = getToken();
-    if (!token) {
-      if (process.env.NODE_ENV === "production") {
-        console.warn(
-          "[Mixpanel] No token in this build — analytics disabled. Set NEXT_PUBLIC_MIXPANEL_TOKEN at build time (e.g. GitHub Actions secret)."
-        );
-      }
+    if (hasConsent()) {
+      if (token) initMixpanel();
       return;
     }
-    if (hasConsent()) {
-      initMixpanel();
-      return;
+    if (!token && process.env.NODE_ENV === "production") {
+      console.warn(
+        "[Mixpanel] No token in this build — analytics disabled. Set NEXT_PUBLIC_MIXPANEL_TOKEN at build time (e.g. GitHub Actions secret)."
+      );
     }
     setShowBanner(true);
   }, [mounted]);
@@ -64,6 +61,11 @@ export function ConsentBanner() {
           We use analytics to improve the site (e.g. where users go and how they use the checkout).
           By continuing, you allow us to use cookies and similar tech for analytics. You can decline;
           the site will still work.
+          {!getToken() && (
+            <span className="block mt-1 text-amber-300">
+              Analytics not configured on this deployment — no events will be sent.
+            </span>
+          )}
         </p>
         <div className="flex gap-2 shrink-0">
           <Button
