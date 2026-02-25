@@ -37,7 +37,14 @@ let initialized = false;
 export function initMixpanel(): boolean {
   if (typeof window === "undefined") return false;
   const token = getToken();
-  if (!token) return false;
+  if (!token) {
+    if (process.env.NODE_ENV === "production") {
+      console.warn(
+        "[Mixpanel] Token not set. Events will not be sent. Ensure NEXT_PUBLIC_MIXPANEL_TOKEN is set at build time (e.g. GitHub Actions secret)."
+      );
+    }
+    return false;
+  }
   if (CONSENT_REQUIRED && !hasConsent()) return false;
   if (initialized) return true;
 

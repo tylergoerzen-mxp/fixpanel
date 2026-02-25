@@ -25,7 +25,14 @@ export function ConsentBanner() {
   useEffect(() => {
     if (!mounted || typeof window === "undefined") return;
     const token = getToken();
-    if (!token) return;
+    if (!token) {
+      if (process.env.NODE_ENV === "production") {
+        console.warn(
+          "[Mixpanel] No token in this build — analytics disabled. Set NEXT_PUBLIC_MIXPANEL_TOKEN at build time (e.g. GitHub Actions secret)."
+        );
+      }
+      return;
+    }
     if (hasConsent()) {
       initMixpanel();
       return;

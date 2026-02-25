@@ -77,6 +77,15 @@ jobs:
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-
       - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
+      - name: Verify Mixpanel token for production build
+        run: |
+          if [ -z "$NEXT_PUBLIC_MIXPANEL_TOKEN" ]; then
+            echo "::error::NEXT_PUBLIC_MIXPANEL_TOKEN secret is not set. Add it in repo Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          echo "Mixpanel token is set (length ${#NEXT_PUBLIC_MIXPANEL_TOKEN})"
+        env:
+          NEXT_PUBLIC_MIXPANEL_TOKEN: ${{ secrets.NEXT_PUBLIC_MIXPANEL_TOKEN }}
       - name: Build with Next.js
         run: ${{ steps.detect-package-manager.outputs.manager }} run build
         env:
