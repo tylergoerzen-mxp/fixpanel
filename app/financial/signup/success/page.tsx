@@ -7,7 +7,7 @@ import { CheckCircle2Icon, HomeIcon } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import Link from "next/link";
-import { track } from "@/lib/mixpanel";
+import { identify, track } from "@/lib/mixpanel";
 
 export default function KYCSuccessPage() {
   const router = useRouter();
@@ -41,6 +41,9 @@ export default function KYCSuccessPage() {
 
     setHasTracked(true);
 
+    // Identify before sign_up_completed so the event is attributed to the user (skill: correct signup flow order)
+    const userId = "financial-kyc-" + (typeof window !== "undefined" ? Date.now().toString(36) : "demo");
+    identify(userId);
     track("sign_up_completed", {
       sign_up_method: "kyc",
       platform: "web",

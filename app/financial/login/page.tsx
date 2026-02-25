@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,19 +9,22 @@ import { Label } from "@/components/ui/label";
 import { CreditCardIcon } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-<Header />;
+import { identify, track } from "@/lib/mixpanel";
 
 export default function Component() {
-  useEffect(() => {
-    
-  }, []);
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send the login credentials to your backend
+    // Demo: use stable id from email for identity merge; in production use backend user id
+    const userId = "financial-" + (email || "anonymous").toLowerCase().replace(/\s+/g, "");
+    identify(userId);
+    track("login_completed", {
+      sign_up_method: "email",
+      platform: "web",
+      vertical: "financial",
+    });
     console.log("Login form submitted", { email, password });
   };
 

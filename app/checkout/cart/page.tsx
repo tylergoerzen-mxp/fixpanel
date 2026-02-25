@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import Link from "next/link";
+import { track } from "@/lib/mixpanel";
 import {
   ShoppingCartIcon,
   MinusIcon,
@@ -63,6 +64,19 @@ export default function CartPage() {
   const [couponApplied, setCouponApplied] = useState(false);
   const [couponError, setCouponError] = useState("");
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+
+  const cartViewedTracked = useRef(false);
+  useEffect(() => {
+    if (cartItems.length > 0 && !cartViewedTracked.current) {
+      cartViewedTracked.current = true;
+      const cartTotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      track("cart_viewed", {
+        item_count: cartItems.length,
+        cart_total: Math.round(cartTotal * 100) / 100,
+        vertical: "checkout",
+      });
+    }
+  }, [cartItems.length, cartItems]);
 
   const updateQuantity = (id: number, newQuantity: number) => {
     if (newQuantity === 0) {

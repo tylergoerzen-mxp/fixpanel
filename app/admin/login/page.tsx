@@ -7,6 +7,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useRouter } from "next/navigation";
 import { LockIcon, MailIcon, ShieldCheckIcon, Loader2Icon } from "lucide-react";
+import { identify, track } from "@/lib/mixpanel";
 
 export default function AdminLogin() {
   const router = useRouter();
@@ -19,6 +20,14 @@ export default function AdminLogin() {
 
     // Show loader
     setIsLoading(true);
+
+    // Demo: identify and track login before redirect; in production use backend user id
+    const userId = "admin-" + (email || "anonymous").toLowerCase().replace(/\s+/g, "");
+    identify(userId);
+    track("login_completed", {
+      platform: "web",
+      vertical: "admin",
+    });
 
     // Simulate auth with loader then redirect to dashboard
     setTimeout(() => {
@@ -132,7 +141,10 @@ export default function AdminLogin() {
                 variant="outline"
                 className="w-full hover:bg-opacity-90 active:scale-95 transition-all"
                 disabled={isLoading}
-                onClick={() => {                  setIsLoading(true);
+                onClick={() => {
+                  setIsLoading(true);
+                  identify("admin-sso-google");
+                  track("login_completed", { platform: "web", vertical: "admin", login_method: "google" });
                   setTimeout(() => router.push("/admin/dashboard"), 1500);
                 }}
               >
@@ -160,7 +172,10 @@ export default function AdminLogin() {
                 variant="outline"
                 className="w-full hover:bg-opacity-90 active:scale-95 transition-all"
                 disabled={isLoading}
-                onClick={() => {                  setIsLoading(true);
+                onClick={() => {
+                  setIsLoading(true);
+                  identify("admin-sso-microsoft");
+                  track("login_completed", { platform: "web", vertical: "admin", login_method: "microsoft" });
                   setTimeout(() => router.push("/admin/dashboard"), 1500);
                 }}
               >

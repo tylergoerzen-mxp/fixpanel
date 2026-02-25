@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import Link from "next/link";
+import { track } from "@/lib/mixpanel";
 import {
   ThumbsUpIcon,
   ThumbsDownIcon,
@@ -38,10 +39,14 @@ export default function VideoWatchPage() {
   const [copyLinkSuccess, setCopyLinkSuccess] = useState(false);
 
   // Get video info from URL params (in a real app)
+  const contentId = "watch-demo";
   const videoTitle = "You clicked on a video!";
   const channelName = "meTube Channel";
   const uploadDate = "April 1, 2024";
   const videoUrl = typeof window !== 'undefined' ? window.location.href : '';
+
+  const videoPlayedTracked = useRef(false);
+  const streamingProps = () => ({ content_id: contentId, video_title: videoTitle, channel_name: channelName, vertical: "streaming" as const });
 
   const handleLike = () => {
     // THE BROKEN LIKE BUTTON! 🐛
@@ -74,7 +79,7 @@ export default function VideoWatchPage() {
       setLikes(likes - 1); // Remove like
     }
 
-    // Track successful like action (PRECISION EVENT - only on success!)
+    track("video_liked", { ...streamingProps(), action: wasLiked ? "removed" : "added" });
   };
 
   const handleDislike = () => {
@@ -108,7 +113,7 @@ export default function VideoWatchPage() {
       setDislikes(dislikes - 1); // Remove dislike
     }
 
-    // Track successful dislike action (PRECISION EVENT - only on success!)
+    track("video_disliked", { ...streamingProps(), action: wasDisliked ? "removed" : "added" });
   };
 
   const handleSubscribe = () => {
@@ -131,13 +136,12 @@ export default function VideoWatchPage() {
 
     setIsSubscribed(!isSubscribed);
 
-    // Track successful subscription
+    track("channel_subscribed", { ...streamingProps(), subscribed: !isSubscribed });
   };
 
   const handleShare = () => {
     setIsShareModalOpen(true);
-
-    // Track share modal opened
+    track("share_modal_opened", streamingProps());
   };
 
   const handleCopyLink = async () => {
@@ -145,15 +149,14 @@ export default function VideoWatchPage() {
       await navigator.clipboard.writeText(videoUrl);
       setCopyLinkSuccess(true);
       setTimeout(() => setCopyLinkSuccess(false), 2000);
-
-      // Track copy link
+      track("content_shared", { ...streamingProps(), share_method: "copy_link" });
     } catch (err) {
       console.error('Failed to copy:', err);
     }
   };
 
   const handleSocialShare = (platform: string) => {
-    // Track social share
+    track("content_shared", { ...streamingProps(), share_method: platform });
     // Open share URLs
     const shareUrls: { [key: string]: string } = {
       twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(videoTitle)}&url=${encodeURIComponent(videoUrl)}`,
@@ -166,9 +169,6 @@ export default function VideoWatchPage() {
       window.open(shareUrls[platform], '_blank', 'width=600,height=400');
     }
   };
-
-  // Track video start
-  useEffect(() => {  }, []);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -192,10 +192,13 @@ export default function VideoWatchPage() {
                   controls
                   autoPlay
                   onPlay={() => {
-                    // Track video play
+                    if (!videoPlayedTracked.current) {
+                      videoPlayedTracked.current = true;
+                      track("video_played", streamingProps());
+                    }
                   }}
                   onPause={() => {
-                    // Track video pause
+                    track("video_paused", streamingProps());
                   }}
                 >
                   <source src="https://storage.googleapis.com/mp-customer-upload/RickRoll.mp4" type="video/mp4" />

@@ -94,7 +94,13 @@ export default function WeBuyHomePage() {
 
   const openProductModal = (product: typeof products[0]) => {
     setSelectedProduct(product);
-    // Track product view
+    track("product_viewed", {
+      product_id: product.id,
+      product_name: product.name,
+      category: product.category.toLowerCase().replace(/\s+/g, "_"),
+      price: product.price,
+      vertical: "checkout",
+    });
   };
 
   const closeProductModal = () => {
