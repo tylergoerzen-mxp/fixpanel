@@ -105,7 +105,8 @@ export default function SupportPage() {
       [faqId]: isHelpful
     }));
 
-    // Track helpful votes  };
+    // Track helpful votes
+  };
 
   const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -539,7 +539,8 @@ export default function MeTubeHomePage() {
       });
     }
 
-    // Track like action  };
+    // Track like action
+  };
 
   const handleSubscribe = (channel: string) => {
     const isSubscribed = subscribedChannels.has(channel);
@@ -568,7 +569,8 @@ export default function MeTubeHomePage() {
       });
     }
 
-    // Track successful subscription  };
+    // Track successful subscription
+  };
 
   // Track page view
   useEffect(() => {  }, [selectedCategory]);

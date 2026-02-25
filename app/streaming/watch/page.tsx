@@ -74,7 +74,8 @@ export default function VideoWatchPage() {
       setLikes(likes - 1); // Remove like
     }
 
-    // Track successful like action (PRECISION EVENT - only on success!)  };
+    // Track successful like action (PRECISION EVENT - only on success!)
+  };
 
   const handleDislike = () => {
     // THE BROKEN DISLIKE BUTTON! 🐛
@@ -107,7 +108,8 @@ export default function VideoWatchPage() {
       setDislikes(dislikes - 1); // Remove dislike
     }
 
-    // Track successful dislike action (PRECISION EVENT - only on success!)  };
+    // Track successful dislike action (PRECISION EVENT - only on success!)
+  };
 
   const handleSubscribe = () => {
     // THE BROKEN SUBSCRIBE BUTTON! 🐛
@@ -129,12 +131,14 @@ export default function VideoWatchPage() {
 
     setIsSubscribed(!isSubscribed);
 
-    // Track successful subscription  };
+    // Track successful subscription
+  };
 
   const handleShare = () => {
     setIsShareModalOpen(true);
 
-    // Track share modal opened  };
+    // Track share modal opened
+  };
 
   const handleCopyLink = async () => {
     try {
@@ -142,7 +146,8 @@ export default function VideoWatchPage() {
       setCopyLinkSuccess(true);
       setTimeout(() => setCopyLinkSuccess(false), 2000);
 
-      // Track copy link    } catch (err) {
+      // Track copy link
+    } catch (err) {
       console.error('Failed to copy:', err);
     }
   };
@@ -187,9 +192,11 @@ export default function VideoWatchPage() {
                   controls
                   autoPlay
                   onPlay={() => {
-                    // Track video play                  }}
+                    // Track video play
+                  }}
                   onPause={() => {
-                    // Track video pause                  }}
+                    // Track video pause
+                  }}
                 >
                   <source src="https://storage.googleapis.com/mp-customer-upload/RickRoll.mp4" type="video/mp4" />
                   Your browser does not support the video tag.

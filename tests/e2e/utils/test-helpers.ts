@@ -92,9 +92,10 @@ export async function resetSession(page: Page) {
 export async function setFeatureFlag(page: Page, flagName: string, variant: string) {
   await page.evaluate(({ flagName, variant }) => {
     // Mock the feature flag response
-    if (window.mixpanel?.flags) {
-      window.mixpanel.flags._flags = {
-        ...window.mixpanel.flags._flags,
+    const mp = window.mixpanel as { flags?: { _flags?: Record<string, string> } } | undefined;
+    if (mp?.flags) {
+      mp.flags._flags = {
+        ...mp.flags._flags,
         [flagName]: variant
       };
     }

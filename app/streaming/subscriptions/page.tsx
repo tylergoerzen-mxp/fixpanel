@@ -104,7 +104,8 @@ export default function SubscriptionsPage() {
   };
 
   const handleChannelClick = (channelId: number) => {
-    // Track channel click  };
+    // Track channel click
+  };
 
   const filteredChannels = subscribedChannels.filter(channel =>
     channel.name.toLowerCase().includes(searchTerm.toLowerCase())

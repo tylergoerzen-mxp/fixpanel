@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import { track } from "@/lib/mixpanel";
 import Link from "next/link";
 import {
   ShoppingCartIcon,
@@ -172,11 +173,13 @@ export default function DealsPage() {
   };
 
   const addToCart = (dealId: number) => {
-    const existingItem = cart.find(item => item.id === dealId);
+    const deal = dailyDeals.find((d) => d.id === dealId);
+    const existingItem = cart.find((item) => item.id === dealId);
+    const newQuantity = existingItem ? existingItem.quantity + 1 : 1;
     let newCart;
 
     if (existingItem) {
-      newCart = cart.map(item =>
+      newCart = cart.map((item) =>
         item.id === dealId ? { ...item, quantity: item.quantity + 1 } : item
       );
     } else {
@@ -185,12 +188,21 @@ export default function DealsPage() {
 
     setCart(newCart);
 
-    // Save to localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('theybuy_cart', JSON.stringify(newCart));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("theybuy_cart", JSON.stringify(newCart));
     }
 
-    // Track add to cart from deals  };
+    if (deal) {
+      track("add_to_cart", {
+        product_id: deal.id,
+        product_name: deal.name,
+        category: deal.category.toLowerCase().replace(/\s+/g, "_"),
+        price: deal.salePrice,
+        quantity: newQuantity,
+        vertical: "checkout",
+      });
+    }
+  };
 
   const getCartItemCount = useCallback(() => {
     return cart.reduce((total, item) => total + item.quantity, 0);

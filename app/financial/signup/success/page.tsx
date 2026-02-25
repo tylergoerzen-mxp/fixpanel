@@ -7,6 +7,7 @@ import { CheckCircle2Icon, HomeIcon } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import Link from "next/link";
+import { track } from "@/lib/mixpanel";
 
 export default function KYCSuccessPage() {
   const router = useRouter();
@@ -40,15 +41,21 @@ export default function KYCSuccessPage() {
 
     setHasTracked(true);
 
+    track("sign_up_completed", {
+      sign_up_method: "kyc",
+      platform: "web",
+      vertical: "financial",
+    });
+
     // Clear the completed data from sessionStorage
-    if (typeof window !== 'undefined') {
-      sessionStorage.removeItem('ibank_kyc_completed');
-      console.log('[KYC SUCCESS]: Cleared completed data after tracking');
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem("ibank_kyc_completed");
+      console.log("[KYC SUCCESS]: Cleared completed data after tracking");
     }
 
     // Redirect to financial home
     setTimeout(() => {
-      router.push('/financial');
+      router.push("/financial");
     }, 500);
   };
 

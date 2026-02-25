@@ -98,7 +98,8 @@ export default function TrendingPage() {
     }
     setLikedVideos(newLikedVideos);
 
-    // Track like action  };
+    // Track like action
+  };
 
   // THE BROKEN SUBSCRIBE BUTTON! (10% success rate + drift)
   const handleSubscribe = (channel: string, event: React.MouseEvent) => {
@@ -118,8 +119,10 @@ export default function TrendingPage() {
       }
       setSubscribedChannels(newSubscribed);
 
-      // Track successful subscription    } else {
-      // Track failed subscription    }
+      // Track successful subscription
+    } else {
+      // Track failed subscription
+    }
   };
 
   // Track page view

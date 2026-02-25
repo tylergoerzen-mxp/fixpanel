@@ -84,7 +84,8 @@ export default function CartPage() {
       )
     );
 
-    // Track quantity update  };
+    // Track quantity update
+  };
 
   const removeItem = (id: number) => {
     const item = cartItems.find(item => item.id === id);
@@ -95,7 +96,8 @@ export default function CartPage() {
     // Update cart items display
     setCartItems(prev => prev.filter(item => item.id !== id));
 
-    // Track item removal  };
+    // Track item removal
+  };
 
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const discount = couponApplied ? subtotal * 0.15 : 0; // 15% discount
@@ -115,14 +117,14 @@ export default function CartPage() {
       // 90% failure rate - this is the UX issue we're demonstrating!
       const shouldWork = Math.random() < 0.1;
 
-      if (shouldWork && couponCode.toLowerCase() === 'save15') {
+      if (shouldWork && couponCode.toLowerCase() === "save15") {
         setCouponApplied(true);
         setCouponError("");
-
-        // Track successful coupon application      } else {
+        // Track successful coupon application
+      } else {
         setCouponError("Unable to apply coupon. Please try again.");
-
-        // Track coupon failure      }
+        // Track coupon failure
+      }
 
       setIsApplyingCoupon(false);
     }, 1000);

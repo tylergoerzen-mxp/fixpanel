@@ -20,6 +20,7 @@ import { CouponDrawer } from "./CouponDrawer";
 import { ChatbotWidget } from "./ChatbotWidget";
 import { DynamicCTAButton } from "./DynamicCTAButton";
 import { products } from "./products";
+import { track } from "@/lib/mixpanel";
 
 export default function WeBuyHomePage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -61,18 +62,30 @@ export default function WeBuyHomePage() {
   });
 
   const addToCart = (productId: number) => {
-    // Track add to cart event
-    setCart(prev => {
-      const existing = prev.find(item => item.id === productId);
+    const product = products.find((p) => p.id === productId);
+    const prevQuantity = cart.find((item) => item.id === productId)?.quantity ?? 0;
+    const newQuantity = prevQuantity + 1;
+
+    setCart((prev) => {
+      const existing = prev.find((item) => item.id === productId);
       if (existing) {
-        return prev.map(item =>
-          item.id === productId
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
+        return prev.map((item) =>
+          item.id === productId ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
       return [...prev, { id: productId, quantity: 1 }];
     });
+
+    if (product) {
+      track("add_to_cart", {
+        product_id: product.id,
+        product_name: product.name,
+        category: product.category.toLowerCase().replace(/\s+/g, "_"),
+        price: product.price,
+        quantity: newQuantity,
+        vertical: "checkout",
+      });
+    }
   };
 
   const getCartItemCount = () => {
@@ -81,8 +94,8 @@ export default function WeBuyHomePage() {
 
   const openProductModal = (product: typeof products[0]) => {
     setSelectedProduct(product);
-
-    // Track product view  };
+    // Track product view
+  };
 
   const closeProductModal = () => {
     setSelectedProduct(null);

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
+import { track } from "@/lib/mixpanel";
 import { Input } from "@/components/ui/input";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -88,8 +89,17 @@ export default function CheckoutPage() {
     }
   }, []);
 
-  // Track page views for each step
-  useEffect(() => {  }, [currentStep, orderTotal, cartItems]);
+  const checkoutStartedTracked = useRef(false);
+  useEffect(() => {
+    if (cartItems.length > 0 && !checkoutStartedTracked.current) {
+      checkoutStartedTracked.current = true;
+      track("checkout_started", {
+        item_count: cartItems.length,
+        cart_total: subtotal,
+        vertical: "checkout",
+      });
+    }
+  }, [cartItems.length, subtotal]);
 
   // CHECKOUT BUTTON TIMEOUT - Random 30-45 second delay (only on step 3)
   useEffect(() => {
@@ -132,13 +142,18 @@ export default function CheckoutPage() {
     // After 10 clicks, actually process the order
     setIsProcessing(true);
 
-    // Track checkout attempt
     // Simulate payment processing
     setTimeout(() => {
       setOrderComplete(true);
       setIsProcessing(false);
 
-      // Track successful purchase with real cart data    }, 3000);
+      track("checkout_completed", {
+        order_total: orderTotal,
+        item_count: cartItems.length,
+        payment_method: "credit_card",
+        vertical: "checkout",
+      });
+    }, 3000);
   };
 
   if (orderComplete) {

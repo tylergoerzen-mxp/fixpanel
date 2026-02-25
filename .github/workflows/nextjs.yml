@@ -81,6 +81,8 @@ jobs:
         run: ${{ steps.detect-package-manager.outputs.manager }} run build
         env:
           NODE_ENV: production
+          # Required for Mixpanel in the deployed site (add secret in repo Settings → Secrets → Actions)
+          NEXT_PUBLIC_MIXPANEL_TOKEN: ${{ secrets.NEXT_PUBLIC_MIXPANEL_TOKEN }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

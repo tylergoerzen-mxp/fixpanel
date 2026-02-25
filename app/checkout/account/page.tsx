@@ -119,7 +119,8 @@ export default function AccountPage() {
     setIsEditing(false);
     setClickCount(prev => prev + 1);
 
-    // Track profile update  };
+    // Track profile update
+  };
 
   const handleNotificationToggle = (key: string) => {
     setNotifications(prev => ({
@@ -127,10 +128,12 @@ export default function AccountPage() {
       [key]: !prev[key as keyof typeof notifications]
     }));
 
-    // Track notification preference  };
+    // Track notification preference
+  };
 
   const removeFromWishlist = (itemId: number) => {
-    // Track wishlist removal  };
+    // Track wishlist removal
+  };
 
   // Track page view
   useEffect(() => {  }, [activeTab]);
